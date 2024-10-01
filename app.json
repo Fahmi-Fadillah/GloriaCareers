@@ -6,23 +6,20 @@
     },
     "name": "JobCentral",
     "slug": "jobcentral",
-    "icon": "./assets/applogo.png",
+    "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/icon2.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "android": {
       "package": "com.bankugrp.jobseeker",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icons/icon2.png",
+        "foregroundImage": "./assets/adaptiveIcon.png",
         "backgroundColor": "#FFFFFF"
       }
     },
-    "plugins": [
-      "expo-router",
-      "expo-font"
-    ],
+    "plugins": ["expo-router", "expo-font"],
     "extra": {
       "router": {
         "origin": false
