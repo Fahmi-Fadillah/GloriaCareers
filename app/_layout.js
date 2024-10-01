@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { useFonts } from "expo-font";
+// import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getDoc } from "firebase/firestore";
@@ -8,11 +8,11 @@ import { ActivityIndicator } from "react-native";
 import { db } from "./firebase";
 
 const Layout = () => {
-  const [fontsLoaded] = useFonts({
-    DMBold: require("../assets/fonts/DMSans-Bold.ttf"),
-    DMMedium: require("../assets/fonts/DMSans-Medium.ttf"),
-    DMRegular: require("../assets/fonts/DMSans-Regular.ttf"),
-  });
+  // const [fontsLoaded] = useFonts({
+  //   DMBold: require("../assets/fonts/DMSans-Bold.ttf"),
+  //   DMMedium: require("../assets/fonts/DMSans-Medium.ttf"),
+  //   DMRegular: require("../assets/fonts/DMSans-Regular.ttf"),
+  // });
 
   const navigation = useNavigation();
 
@@ -35,14 +35,13 @@ const Layout = () => {
         navigation.navigate("auth");
       }
     });
-
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, [navigation]);
 
-  if (!fontsLoaded) {
-    return <ActivityIndicator size="large" color={"#fff"} />;
-  }
+  // if (!fontsLoaded) {
+  //   return <ActivityIndicator size="large" color={"#fff"} />;
+  // }
 
   return (
     <Stack>

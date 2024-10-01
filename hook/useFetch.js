@@ -10,6 +10,7 @@ const useFetch = (endpoint, query) => {
     process.env.REACT_APP_API_KEY_5,
     process.env.REACT_APP_API_KEY_2,
     process.env.REACT_APP_API_KEY_3,
+    process.env.REACT_APP_API_KEY_4,
     process.env.REACT_APP_API_KEY_1,
     //  more keys
   ];
