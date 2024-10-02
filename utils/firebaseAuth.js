@@ -11,6 +11,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   setDoc,
   updateDoc,
 } from "firebase/firestore";
@@ -130,5 +131,97 @@ export const saveJob = async (
   } catch (e) {
     console.error("Error posting job: ", e);
     throw e;
+  }
+};
+
+export const fetchJobs = async () => {
+  try {
+    const q = collection(db, "jobs");
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map((doc) => doc.data());
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
+export const fetchJobDetails = async (jobId) => {
+  try {
+    const docRef = doc(db, "jobs", jobId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const job = docSnap.data();
+      const userId = auth.currentUser.uid;
+      const userDocRef = doc(db, `seekers`, userId);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const savedJobs = userDocSnap.data().savedJobs || [];
+        const appliedJobs = userDocSnap.data().appliedJobs || [];
+        const isLiked = savedJobs.includes(jobId);
+        const isApplied = appliedJobs.includes(jobId);
+        return { job, isLiked, isApplied };
+      } else {
+        throw new Error("User document does not exist");
+      }
+    } else {
+      throw new Error("No such document!");
+    }
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
+export const handleLike = async (jobId) => {
+  const userId = auth.currentUser.uid;
+  const userDocRef = doc(db, `seekers`, userId);
+  const userDocSnap = await getDoc(userDocRef);
+
+  if (userDocSnap.exists()) {
+    const savedJobs = userDocSnap.data().savedJobs || [];
+    if (savedJobs.includes(jobId)) {
+      // The job is already liked, so we don't do anything
+      console.log("Job already liked");
+      showToast("Job is already liked");
+      return true;
+    } else {
+      await updateDoc(userDocRef, {
+        savedJobs: arrayUnion(jobId),
+      });
+      showToast("Job liked successfully");
+      return true;
+    }
+  } else {
+    throw new Error("User document does not exist");
+  }
+};
+
+export const applyForJob = async (jobId) => {
+  const jobDocRef = doc(db, "jobs", jobId);
+  const jobDocSnap = await getDoc(jobDocRef);
+
+  if (!jobDocSnap.exists()) {
+    throw new Error("Job does not exist in the app's jobs collection");
+  }
+
+  const userId = auth.currentUser.uid;
+  const userDocRef = doc(db, `seekers`, userId);
+  const userDocSnap = await getDoc(userDocRef);
+
+  if (userDocSnap.exists()) {
+    const appliedJobs = userDocSnap.data().appliedJobs || [];
+    if (appliedJobs.includes(jobId)) {
+      console.log("Job already applied");
+      showToast("Job is already applied");
+      return true;
+    } else {
+      await updateDoc(userDocRef, {
+        appliedJobs: arrayUnion(jobId),
+      });
+      showToast("Job applied successfully");
+      return true;
+    }
+  } else {
+    throw new Error("User document does not exist");
   }
 };

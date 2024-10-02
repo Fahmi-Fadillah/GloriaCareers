@@ -1,32 +1,54 @@
-import { Image, Linking, Text, TouchableOpacity, View } from "react-native";
-import { icons } from "../../../constants";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SIZES } from '../../../constants';
+import { applyForJob } from '../../../utils/firebaseAuth';
 import styles from "./footer.style";
-const Footer = ({ url, onLike, isLiked }) => {
+const Footer = ({ url, onLike, isLiked, isApplied, jobId, isEmployerPage }) => {
 
 
   const handleLikeButtonPress = () => {
     onLike();
-    // Add any other code you want to execute when the like button is clicked
   };
 
+  const handleApply = async () => {
+    if (isEmployerPage) {
+      await applyForJob(jobId);
+    } else {
+      await Linking.openURL(url);
+    }
+  };
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.likeBtn} onPress={handleLikeButtonPress} >
-        <Image
-          source={isLiked ? icons.heart : icons.heartOutline}
-          resizeMode='contain'
-          style={styles.likeBtnImage}
-        />
+        {
+          isLiked ?
+            <Ionicons name="bookmark" size={32} color="#6EACDA" />
+            :
+            <Ionicons name="bookmark-outline" size={32} color="#6EACDA" />
+        }
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.applyBtn}
-        onPress={() => Linking.openURL(url)}
+        style={isApplied ? styles2.appliedBtn : styles.applyBtn}
+        onPress={handleApply}
       >
-        <Text style={styles.applyBtnText}>Apply for job</Text>
+        <Text style={styles.applyBtnText}>{isApplied ? "Already Applied! " : "Apply for job"}</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
 export default Footer;
+
+const styles2 = StyleSheet.create({
+  appliedBtn: {
+    flex: 1,
+    backgroundColor: "#ccc",
+    padding: 12,
+    borderRadius: 8,
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: SIZES.medium,
+  },
+})

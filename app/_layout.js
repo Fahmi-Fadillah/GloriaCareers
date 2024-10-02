@@ -71,7 +71,7 @@ const Layout = () => {
           name="employer/createJobs"
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="employer/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="employer/[id]" options={{ headerShown: true }} />
         <Stack.Screen
           name="employer/employerProfile"
           options={{ headerShown: false }}

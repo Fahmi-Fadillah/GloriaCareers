@@ -1,15 +1,8 @@
 import { useRoute } from "@react-navigation/native";
 import { Stack, useRouter } from "expo-router";
-import { doc, getDoc, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  SafeAreaView,
-  ScrollView,
-  Share,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, ScrollView, Share, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Company,
   JobAbout,
@@ -18,8 +11,8 @@ import {
   ScreenHeaderBtn,
 } from "../../components";
 import { COLORS, icons, SIZES } from "../../constants";
-import { showToast } from "../../utils";
-import { auth, db } from "../firebase";
+import { globalStyles } from "../../styles/styles";
+import { fetchJobDetails, handleLike } from "../../utils/firebaseAuth";
 
 const tabs = ["About", "Qualifications", "Responsibilities"];
 
@@ -32,27 +25,15 @@ function EmployerCreatedJobs({}) {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [isLiked, setIsLiked] = useState(false);
+  const [isApplied, setIsApplied] = useState(false);
 
   useEffect(() => {
-    const fetchJobDetails = async () => {
+    const fetchDetails = async () => {
       try {
-        const docRef = doc(db, "jobs", id);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          setJob(docSnap.data());
-          const userId = auth.currentUser.uid;
-          const jobDocRef = doc(db, `likedJobs/${userId}/jobs`, id);
-          const jobDocSnap = await getDoc(jobDocRef);
-
-          if (jobDocSnap.exists()) {
-            setIsLiked(true);
-          } else {
-            setIsLiked(false);
-          }
-        } else {
-          setError("No such document!");
-        }
+        const { job, isLiked, isApplied } = await fetchJobDetails(id);
+        setJob(job);
+        setIsLiked(isLiked);
+        setIsApplied(isApplied);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -60,30 +41,15 @@ function EmployerCreatedJobs({}) {
       }
     };
 
-    fetchJobDetails();
+    fetchDetails();
   }, [id]);
 
-  const handleLike = async () => {
-    const userId = auth.currentUser.uid;
-    const jobDocRef = doc(db, `likedJobs/${userId}/jobs`, job.id);
-    const jobDocSnap = await getDoc(jobDocRef);
-
-    if (jobDocSnap.exists()) {
-      // The job is already liked, so we don't do anything
-      console.log("Job already liked");
+  const handleLikeJob = async () => {
+    try {
+      await handleLike(job.id);
       setIsLiked(true);
-      showToast("Job is already liked");
-    } else {
-      const jobDetailsObject = {
-        jobTitle: job.jobRole,
-        employerName: job.companyName,
-        jobCountry: "India",
-        jobLogo: "logo here",
-        jobId: job.id,
-        type: "employer",
-      };
-      await setDoc(jobDocRef, jobDetailsObject);
-      setIsLiked(true);
+    } catch (err) {
+      console.error(err.message);
     }
   };
 
@@ -127,7 +93,7 @@ function EmployerCreatedJobs({}) {
 
   return (
     <>
-      <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.lightWhite }}>
+      <SafeAreaView style={globalStyles.container}>
         <Stack.Screen
           options={{
             headerStyle: { backgroundColor: COLORS.lightWhite },
@@ -160,9 +126,18 @@ function EmployerCreatedJobs({}) {
             headerTitle: "",
           }}
         />
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={globalStyles.scrollViewContent}
+          showsVerticalScrollIndicator={false}
+        >
           {isLoading ? (
-            <ActivityIndicator size="large" color={COLORS.primary} />
+            <ActivityIndicator
+              style={{
+                alignSelf: "center",
+              }}
+              size="large"
+              color={COLORS.primary}
+            />
           ) : error ? (
             <Text>Something went wrong</Text>
           ) : job === null ? (
@@ -173,7 +148,7 @@ function EmployerCreatedJobs({}) {
                 companyLogo={job.employer_logo}
                 jobTitle={job.jobRole}
                 companyName={job.companyName}
-                location={job.job_country}
+                location={"India"}
               />
 
               <JobTabs
@@ -187,9 +162,12 @@ function EmployerCreatedJobs({}) {
           )}
         </ScrollView>
         <JobFooter
-          url={"https://careers.google.com/jobs/results/"}
-          onLike={handleLike}
+          url={"kapilbadokar.vercel.app"}
+          isEmployerPage={true}
+          onLike={handleLikeJob}
           isLiked={isLiked}
+          jobId={id}
+          isApplied={isApplied}
         />
       </SafeAreaView>
     </>

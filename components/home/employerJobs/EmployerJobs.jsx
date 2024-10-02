@@ -1,9 +1,8 @@
-import { collection, getDocs } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { db } from '../../../app/firebase';
 import { COLORS, SIZES } from '../../../constants';
 import { showToast } from '../../../utils';
+import { fetchJobs } from '../../../utils/firebaseAuth';
 import EmployerCard from '../../common/cards/employer/EmployerCard';
 import styles from './employerjobs.style';
 
@@ -13,19 +12,19 @@ const EmployerJobs = () => {
     const [jobs, setJobs] = useState([]);
 
     useEffect(() => {
-        const fetchJobs = async () => {
+        const loadJobs = async () => {
             setIsLoading(true);
             try {
-                const q = collection(db, 'jobs');
-                const querySnapshot = await getDocs(q);
-                setJobs(querySnapshot.docs.map((doc) => doc.data()));
-                setIsLoading(false);
+                const jobsData = await fetchJobs();
+                setJobs(jobsData);
             } catch (err) {
-                setIsLoading(false);
                 setError(err.message);
             }
+            finally {
+                setIsLoading(false);
+            }
         };
-        fetchJobs();
+        loadJobs();
     }, []);
 
     return (
