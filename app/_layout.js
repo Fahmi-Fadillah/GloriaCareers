@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { db } from "./firebase";
+import { RootSiblingParent } from "react-native-root-siblings";
 
 const Layout = () => {
   const [fontsLoaded] = useFonts({
@@ -60,21 +61,23 @@ const Layout = () => {
     );
   }
   return (
-    <Stack>
-      <Stack.Screen options={{ header: () => null }} name="auth" />
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="home" options={{ headerShown: true }} />
-      <Stack.Screen name="about" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="employer/createJobs"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen name="employer/[id]" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="employer/employerProfile"
-        options={{ headerShown: false }}
-      />
-    </Stack>
+    <RootSiblingParent>
+      <Stack>
+        <Stack.Screen options={{ header: () => null }} name="auth" />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="home" options={{ headerShown: false }} />
+        <Stack.Screen name="about" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="employer/createJobs"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen name="employer/[id]" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="employer/employerProfile"
+          options={{ headerShown: false }}
+        />
+      </Stack>
+    </RootSiblingParent>
   );
 };
 

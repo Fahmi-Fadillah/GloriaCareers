@@ -1,26 +1,18 @@
-import { useState, useEffect } from "react";
-import { SafeAreaView, ScrollView, View } from "react-native";
-import { Stack, useRouter } from "expo-router";
-import { useNavigation } from "@react-navigation/native";
-import { COLORS, icons, images, SIZES } from "../constants";
-import {
-  Nearbyjobs,
-  Popularjobs,
-  ScreenHeaderBtn,
-  Welcome,
-} from "../components";
-import { BackHandler } from "react-native";
-import profileIcon from "../assets/logo.png";
-import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "expo-router";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { ScrollView, View } from "react-native";
+import { Nearbyjobs, Popularjobs, Welcome } from "../components";
+import { SIZES } from "../constants";
 // import EmployerCard from "../components/common/EmployerCard";
-import { showToast } from "../utils";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AppHeader from "../components/AppHeader";
 import EmployerJobs from "../components/home/employerJobs/EmployerJobs";
-import Toast from "react-native-toast-message";
-
+import { globalStyles } from "../styles/styles";
+import { showToast } from "../utils";
 const Home = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const navigation = useNavigation();
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
@@ -28,15 +20,13 @@ const Home = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsSignedIn(true);
+        showToast("You are logged in");
       } else {
+        console.log("User is signed out");
         setIsSignedIn(false);
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "auth" }], // Replace 'SignIn' with the name of your sign in screen
-        });
+        router.replace("auth");
       }
     });
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
@@ -45,72 +35,12 @@ const Home = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.lightWhite }}>
-      <Stack.Screen
-        options={{
-          headerStyle: { backgroundColor: COLORS.lightWhite },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <ScreenHeaderBtn
-              iconUrl={icons.menu}
-              dimension="60%"
-              options={[
-                {
-                  label: "My Profile",
-                  icon: "account",
-                  action: () => showToast("Profile Coming Soon"),
-                },
-                {
-                  label: "Saved Jobs",
-                  icon: "content-save",
-                  action: () => navigation.navigate("likedJobs"),
-                },
-                {
-                  label: "About Us",
-                  icon: "information",
-                  action: () => navigation.navigate("about"),
-                },
-                {
-                  label: "Settings",
-                  icon: "wrench",
-                  action: () => showToast("Settings Coming Soon"),
-                },
-                {
-                  label: "Logout",
-                  icon: "exit-to-app",
-                  action: () => {
-                    const auth = getAuth();
-                    signOut(auth)
-                      .then(() => {
-                        // Sign-out successful.
-
-                        console.log("User signed out");
-                        // navigation.navigate("auth");
-                      })
-                      .catch((error) => {
-                        // An error happened.
-                        console.log("Error signing out: ", error);
-                      });
-                  },
-                },
-              ]}
-              showModal={true}
-            />
-          ),
-          headerRight: () => (
-            <ScreenHeaderBtn
-              iconUrl={profileIcon}
-              dimension="100%"
-              options={[]}
-              showModal={false}
-              handlePress={() => showToast("Profile Coming Soon")}
-            />
-          ),
-          headerTitle: "",
-        }}
-      />
-
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={globalStyles.container}>
+      <AppHeader />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={globalStyles.scrollViewContent}
+      >
         <View
           style={{
             flex: 1,
@@ -126,12 +56,10 @@ const Home = () => {
               }
             }}
           />
-
           <Popularjobs />
           <EmployerJobs />
           <Nearbyjobs />
         </View>
-        <Toast />
       </ScrollView>
     </SafeAreaView>
   );

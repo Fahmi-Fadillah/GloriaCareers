@@ -1,9 +1,14 @@
 import { StyleSheet } from "react-native";
+import { COLORS } from "../constants";
 
 export const globalStyles = StyleSheet.create({
   containerStyle: {
     flex: 1,
     padding: 16,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.lightWhite,
   },
   scrollViewContent: {
     flexGrow: 1,

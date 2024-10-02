@@ -14,7 +14,6 @@ import BottomBar from "../../components/BottomBar";
 import EmployerJobs from "../../components/home/employerJobs/EmployerJobs";
 import { COLORS, icons, SIZES } from "../../constants";
 import { showToast } from "../../utils";
-import Toast from "react-native-toast-message";
 
 const employerHome = () => {
   const router = useRouter();
@@ -129,7 +128,6 @@ const employerHome = () => {
             <EmployerJobs />
             <Nearbyjobs />
           </View>
-          <Toast />
         </ScrollView>
         <BottomBar navigation={navigation} />
       </View>

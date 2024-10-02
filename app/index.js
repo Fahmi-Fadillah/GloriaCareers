@@ -1,7 +1,19 @@
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from "expo-router";
 
 export default function Loading() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.replace("auth");
+    }, 2000);
+
+    // Cleanup the timer on component unmount
+    return () => clearTimeout(timer);
+  }, [router]);
+
   return (
     <View
       style={{

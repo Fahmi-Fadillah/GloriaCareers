@@ -12,7 +12,6 @@ import * as Yup from "yup";
 import AppTextInput from "../components/AppTextInput";
 import ErrorMessage from "../components/ErrorMessage";
 
-import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Logo from "../assets/logo.png";
 import AppButton from "../components/AppButton";
@@ -23,6 +22,7 @@ import {
   handleSignIn,
   handleUserSignUp,
 } from "../utils/firebaseAuth";
+import { useRouter } from "expo-router";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email().required().label("Email"),
@@ -44,7 +44,10 @@ const validationSchema = Yup.object().shape({
 export default function SignInScreen() {
   const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [isEmployer, setIsEmployer] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const onSignIn = async (email, password) => {
+    setLoading(true);
     try {
       const { userType, userData } = await handleSignIn(email, password);
       if (userType === "employer") {
@@ -54,10 +57,13 @@ export default function SignInScreen() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const onSignUp = async (values) => {
+    setLoading(true);
     try {
       if (isEmployer) {
         await handleEmployerSignUp(
@@ -73,6 +79,8 @@ export default function SignInScreen() {
       router.replace("home");
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -217,6 +225,7 @@ export default function SignInScreen() {
               <AppButton
                 title={isSignUpMode ? "Sign Up" : "Sign in"}
                 onPress={handleSubmit}
+                loading={loading}
               />
               <TouchableOpacity
                 style={styles.inlineText}
