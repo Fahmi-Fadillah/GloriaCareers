@@ -1,198 +1,269 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
 import { Formik } from "formik";
 import React, { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
-import { TouchableOpacity } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import * as Yup from "yup";
 import AppTextInput from "../components/AppTextInput";
 import ErrorMessage from "../components/ErrorMessage";
-import { COLORS } from "../constants";
 
-import { doc } from "firebase/firestore";
+import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Logo from "../assets/logo.png";
+import AppButton from "../components/AppButton";
+import { COLORS } from "../constants";
+import { globalStyles } from "../styles/styles";
+import {
+  handleEmployerSignUp,
+  handleSignIn,
+  handleUserSignUp,
+} from "../utils/firebaseAuth";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email().required().label("Email"),
   password: Yup.string().required().min(6).label("Password"),
+  companyName: Yup.string().when("isEmployer", {
+    is: true,
+    then: Yup.string().required().label("Company Name"),
+  }),
+  companyLocation: Yup.string().when("isEmployer", {
+    is: true,
+    then: Yup.string().required().label("Company Location"),
+  }),
+  name: Yup.string().when("isEmployer", {
+    is: false,
+    then: Yup.string().required().label("Name"),
+  }),
 });
 
 export default function SignInScreen() {
   const [isSignUpMode, setIsSignUpMode] = useState(false);
-
-  const auth = getAuth();
-  const navigation = useNavigation();
-
+  const [isEmployer, setIsEmployer] = useState(false);
   const onSignIn = async (email, password) => {
     try {
-      console.log("doingSignIn" + email + password);
-      await signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          const docRef = doc(db, "employers", user.uid);
-          getDoc(docRef).then((docSnapshot) => {
-            if (docSnapshot.exists()) {
-              const userData = docSnapshot.data();
-              if (userData.role != "employer") {
-                auth.signOut();
-              } else {
-                console.log("You are not an employer");
-                navigation.navigate("home");
-                // Sign out the user
-              }
-            } else {
-              console.log("No such user!");
-              // Sign out the user
-              auth.signOut();
-            }
-          });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } catch (e) {
-      console.log(e);
+      const { userType, userData } = await handleSignIn(email, password);
+      if (userType === "employer") {
+        router.replace("employer/employerHome");
+      } else {
+        router.replace("home");
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
-  const onSignUp = (email, password) => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "home" }], // Replace 'Home' with the name of your home screen
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const onSignUp = async (values) => {
+    try {
+      if (isEmployer) {
+        await handleEmployerSignUp(
+          values.email,
+          values.password,
+          values.companyName,
+          values.companyLocation
+        );
+        router.replace("employer/employerHome");
+      } else {
+        await handleUserSignUp(values.email, values.password, values.name);
+      }
+      router.replace("home");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Image style={styles.logoImg} source={Logo} />
-      <Formik
-        initialValues={{
-          email: "",
-          password: "",
-        }}
-        onSubmit={(values) => {
-          try {
-            isSignUpMode
-              ? onSignUp(values.email, values.password)
-              : onSignIn(values.email, values.password);
-          } catch (e) {
-            console.log(e);
-          }
-        }}
-        validationSchema={validationSchema}
-      >
-        {({
-          handleChange,
-          handleSubmit,
-          errors,
-          values,
-          setFieldTouched,
-          touched,
-        }) => (
-          <>
-            <AppTextInput
-              IconComponent={() => (
-                <MaterialCommunityIcons name="email" size={22} color="black" />
-              )}
-              placeholder={"Enter your Email"}
-              textContentType={"emailAddress"}
-              onChangeText={handleChange("email")}
-              onBlur={() => setFieldTouched("email")}
-              value={values.email}
-              autoCapitalize={"none"}
-            />
-            <ErrorMessage visible={touched.email} error={errors.email} />
-            <AppTextInput
-              IconComponent={() => (
-                <MaterialCommunityIcons name="lock" size={22} color="black" />
-              )}
-              placeholder={"Enter your Password"}
-              textContentType={"password"}
-              onChangeText={handleChange("password")}
-              onBlur={() => setFieldTouched("password")}
-              value={values.password}
-              secureTextEntry
-              autoCapitalize={"none"}
-            />
-            <ErrorMessage error={errors.password} visible={touched.password} />
-            {/* <TouchableOpacity>
-              <MaterialCommunityIcons
-                name={"google"}
-                size={24}
-                style={styles.signIcon}
-              />
-            </TouchableOpacity> */}
+    <SafeAreaView style={globalStyles.containerStyle}>
+      <ScrollView contentContainerStyle={globalStyles.scrollViewContent}>
+        <Image style={styles.logoImg} resizeMode="contain" source={Logo} />
+        <View style={styles.userTypeContainer}>
+          <TouchableOpacity
+            style={[
+              styles.userTypeButton,
+              isEmployer && styles.activeUserTypeButton,
+            ]}
+            onPress={() => setIsEmployer(true)}
+          >
+            <Text
+              style={[
+                styles.userTypeText,
+                isEmployer && styles.activeUserTypeText,
+              ]}
+            >
+              Employer
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.userTypeButton,
+              !isEmployer && styles.activeUserTypeButton,
+            ]}
+            onPress={() => setIsEmployer(false)}
+          >
+            <Text
+              style={[
+                styles.userTypeText,
+                !isEmployer && styles.activeUserTypeText,
+              ]}
+            >
+              Job Seeker
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-            {isSignUpMode ? (
-              <>
-                <TouchableOpacity style={styles.btn} onPress={handleSubmit}>
-                  <Text style={styles.btnText}>Sign Up</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.inlineText}
-                  onPress={() => setIsSignUpMode(false)}
-                >
-                  <Text style={styles.switchText2}>Already registered?</Text>
-                  <Text style={styles.switchText}> Sign in instead</Text>
-                </TouchableOpacity>
-                <Text style={styles.empText}>Or</Text>
-                <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => navigation.navigate("employer/EmployerAuth")}
-                >
-                  <Text style={styles.btnText}>Employer Signup</Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <TouchableOpacity style={styles.btn} onPress={handleSubmit}>
-                  <Text style={styles.btnText}>Sign In</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.inlineText}
-                  onPress={() => setIsSignUpMode(true)}
-                >
-                  <Text style={styles.switchText2}>Not registered?</Text>
-                  <Text style={styles.switchText}> Sign up instead</Text>
-                </TouchableOpacity>
-                <Text style={styles.empText}>Or</Text>
-                <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => navigation.navigate("employer/EmployerAuth")}
-                >
-                  <Text style={styles.btnText}>Employer Login</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </>
-        )}
-      </Formik>
-    </View>
+        <Formik
+          initialValues={{
+            email: "",
+            password: "",
+            name: "",
+            companyName: "",
+            companyLocation: "",
+          }}
+          onSubmit={(values, actions) => {
+            try {
+              isSignUpMode
+                ? onSignUp(values)
+                : onSignIn(values.email, values.password);
+              actions.resetForm();
+            } catch (e) {
+              console.log(e);
+            }
+          }}
+          validationSchema={validationSchema}
+        >
+          {({
+            handleChange,
+            handleSubmit,
+            errors,
+            values,
+            setFieldTouched,
+            touched,
+          }) => (
+            <>
+              <AppTextInput
+                iconName={"mail-outline"}
+                placeholder={"Enter your Email"}
+                textContentType={"emailAddress"}
+                onChangeText={handleChange("email")}
+                onBlur={() => setFieldTouched("email")}
+                value={values.email}
+                autoCapitalize={"none"}
+                accessibilityLabel="email"
+                keyboardType="email-address"
+              />
+              <ErrorMessage visible={touched.email} error={errors.email} />
+              <AppTextInput
+                iconName={"lock-closed-outline"}
+                placeholder={"Enter your Password"}
+                textContentType={"password"}
+                onChangeText={handleChange("password")}
+                onBlur={() => setFieldTouched("password")}
+                value={values.password}
+                secureTextEntry
+                autoCapitalize={"none"}
+                accessibilityLabel="password"
+              />
+              <ErrorMessage
+                error={errors.password}
+                visible={touched.password}
+              />
+              {isEmployer && isSignUpMode && (
+                <>
+                  <AppTextInput
+                    iconName={"business-outline"}
+                    placeholder={"Enter your Company Name"}
+                    onChangeText={handleChange("companyName")}
+                    onBlur={() => setFieldTouched("companyName")}
+                    value={values.companyName}
+                    autoCapitalize={"none"}
+                  />
+                  <ErrorMessage
+                    error={errors.companyName}
+                    visible={touched.companyName}
+                  />
+                  <AppTextInput
+                    iconName={"location-outline"}
+                    placeholder={"Enter your Company Location"}
+                    onChangeText={handleChange("companyLocation")}
+                    onBlur={() => setFieldTouched("companyLocation")}
+                    value={values.companyLocation}
+                    autoCapitalize={"none"}
+                    accessibilityLabel="Location"
+                  />
+                  <ErrorMessage
+                    error={errors.companyLocation}
+                    visible={touched.companyLocation}
+                  />
+                </>
+              )}
+              {!isEmployer && isSignUpMode && (
+                <>
+                  <AppTextInput
+                    iconName={"person-outline"}
+                    placeholder={"Enter your Name"}
+                    onChangeText={handleChange("name")}
+                    onBlur={() => setFieldTouched("name")}
+                    value={values.name}
+                    autoCapitalize={"true"}
+                    accessibilityLabel="name"
+                  />
+                  <ErrorMessage error={errors.name} visible={touched.name} />
+                </>
+              )}
+              <AppButton
+                title={isSignUpMode ? "Sign Up" : "Sign in"}
+                onPress={handleSubmit}
+              />
+              <TouchableOpacity
+                style={styles.inlineText}
+                onPress={() => setIsSignUpMode(!isSignUpMode)}
+              >
+                <Text style={styles.switchText2}>
+                  {isSignUpMode ? "Already registered? " : "Not registered? "}
+                </Text>
+                <Text style={styles.switchText}>
+                  {isSignUpMode ? " Sign in instead" : " Sign up instead"}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Formik>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  userTypeContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 20,
+    gap: 10,
+  },
+  userTypeButton: {
+    padding: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
+  activeUserTypeButton: {
+    backgroundColor: COLORS.primary,
+  },
+  activeUserTypeText: {
+    color: COLORS.white,
+  },
+  userTypeText: {
+    color: COLORS.primary,
+    fontSize: 16,
+  },
   logoImg: {
     width: 250,
     height: 250,
     alignSelf: "center",
-    marginBottom: 5,
-  },
-  container: {
-    flex: 1,
-    justifyContent: "flex-start",
-    padding: 16,
   },
   inlineText: {
     flexDirection: "row",
@@ -202,29 +273,6 @@ const styles = StyleSheet.create({
   empText: {
     textAlign: "center",
     fontSize: 20,
-  },
-  input: {
-    height: 40,
-    width: "100%",
-    fontSize: 20,
-    borderColor: "gray",
-    color: "black",
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingLeft: 8,
-  },
-  btn: {
-    backgroundColor: COLORS.primary,
-    color: "white",
-    padding: 10,
-    height: 50,
-    margin: 10,
-    borderRadius: 5,
-  },
-  btnText: {
-    color: "white",
-    fontSize: 24,
-    textAlign: "center",
   },
   switchText: {
     color: "blue",
@@ -237,10 +285,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 10,
     fontSize: 16,
-  },
-  signIcon: {
-    color: COLORS.primary,
-    textAlign: "center",
-    marginTop: 10,
   },
 });

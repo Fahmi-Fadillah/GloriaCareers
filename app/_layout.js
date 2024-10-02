@@ -1,10 +1,10 @@
+import { useFonts } from "expo-font";
 import { Stack, useRouter } from "expo-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { collection, doc, getDoc } from "firebase/firestore";
-import { useEffect } from "react";
-import { ActivityIndicator, Alert, View } from "react-native";
+import { doc, getDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
 import { db } from "./firebase";
-import { useFonts } from "expo-font";
 
 const Layout = () => {
   const [fontsLoaded] = useFonts({
@@ -13,30 +13,37 @@ const Layout = () => {
     DMRegular: require("../assets/fonts/DMSans-Regular.ttf"),
   });
   const router = useRouter();
-
+  const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
     const auth = getAuth();
-    // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const userDoc = await getDoc(
-          doc(collection(db, "employers"), user.uid)
-        );
-        const userData = userDoc.data();
-        if (userData && userData.role === "employer") {
-          Alert.alert("You are an employer");
+        const employerDoc = await getDoc(doc(db, "employers", user.uid));
+        if (employerDoc.exists()) {
+          console.log("You are an employer");
           router.push("employer/employerHome");
         } else {
-          Alert.alert("You are a job seeker");
-          router.push("home");
+          const jobSeekerDoc = await getDoc(doc(db, "seekers", user.uid));
+          if (jobSeekerDoc.exists()) {
+            console.log("You are a job seeker");
+            router.push("home");
+          } else {
+            console.log("User type not identified");
+            router.push("auth");
+          }
         }
       } else {
-        Alert.alert("You are not signed in");
-        router.push("auth");
+        console.log("You are not signed in");
+        router.navigate("auth");
       }
     });
+    setIsMounted(true);
     return () => unsubscribe();
   }, [router]);
+
+  if (!isMounted) {
+    return null; // or a loading spinner
+  }
 
   if (!fontsLoaded) {
     return (
@@ -63,10 +70,6 @@ const Layout = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="employer/[id]" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="employer/EmployerAuth"
-        options={{ headerShown: false }}
-      />
       <Stack.Screen
         name="employer/employerProfile"
         options={{ headerShown: false }}
