@@ -1,11 +1,21 @@
+import { router } from "expo-router";
 import {
   createUserWithEmailAndPassword,
+  getAuth,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { auth, db } from "../app/firebase";
-import { useRouter } from "expo-router";
+import { showToast } from "../utils/index";
 
 export const handleSignIn = async (email, password) => {
   try {
@@ -81,7 +91,6 @@ export const handleUserSignUp = async (email, password, name) => {
 
 export const handlelogOut = async () => {
   const auth = getAuth();
-  const router = useRouter();
   try {
     await signOut(auth);
     console.log("User signed out");
@@ -90,5 +99,36 @@ export const handlelogOut = async () => {
   } catch (error) {
     console.log("Error signing out: ", error);
     showToast("Error signing out");
+  }
+};
+
+export const saveJob = async (
+  jobRole,
+  qualifications,
+  responsibilities,
+  about
+) => {
+  try {
+    const employerDocRef = doc(db, "employers", auth.currentUser.uid);
+    const employerDoc = await getDoc(employerDocRef);
+    const companyName = employerDoc.data().companyName;
+
+    const jobDocRef = await addDoc(collection(db, "jobs"), {
+      jobRole: jobRole,
+      qualifications: qualifications,
+      responsibilities: responsibilities,
+      about: about,
+      employerId: auth.currentUser.uid,
+      companyName: companyName,
+    });
+    const jobId = jobDocRef.id;
+    await updateDoc(jobDocRef, { id: jobId });
+    await updateDoc(employerDocRef, {
+      createdJobs: arrayUnion(jobId),
+    });
+    console.log("Job posted successfully");
+  } catch (e) {
+    console.error("Error posting job: ", e);
+    throw e;
   }
 };

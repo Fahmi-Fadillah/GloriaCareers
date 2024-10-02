@@ -1,96 +1,83 @@
-import {
-  AntDesign,
-  Feather,
-  MaterialCommunityIcons,
-  SimpleLineIcons,
-} from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
-import React from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { auth, db } from "../../app/firebase";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AppButton from "../../components/AppButton";
 import AppTextInput from "../../components/AppTextInput";
 import BottomBar from "../../components/BottomBar";
 import { COLORS } from "../../constants";
+import { globalStyles } from "../../styles/styles";
+import { saveJob } from "../../utils/firebaseAuth";
+import { showToast } from "../../utils/index";
 
 function createJobs() {
   const navigation = useNavigation();
-
-  const [jobRole, setJobRole] = React.useState("");
-  const [qualifications, setQualifications] = React.useState("");
-  const [responsibilities, setResponsibilities] = React.useState("");
-  const [about, setAbout] = React.useState("");
+  const router = useRouter();
+  const [jobRole, setJobRole] = useState("");
+  const [qualifications, setQualifications] = useState("");
+  const [responsibilities, setResponsibilities] = useState("");
+  const [about, setAbout] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
-      const employerDoc = await getDoc(
-        doc(db, "employers", auth.currentUser.uid)
-      );
-      console.log("Employer document data: ", employerDoc.data());
-      const companyName = employerDoc.data().companyName;
-
-      const docRef = await addDoc(collection(db, "jobs"), {
-        jobRole: jobRole,
-        qualifications: qualifications,
-        responsibilities: responsibilities,
-        about: about,
-        employerId: auth.currentUser.uid,
-        companyName: companyName,
-      });
-      const id = docRef.id;
-      await updateDoc(docRef, { id: id });
-      navigation.navigate("employer/employerHome");
-      console.log("Job posted successfully");
+      if (!jobRole || !qualifications || !responsibilities || !about) {
+        showToast("Please fill all fields");
+        return;
+      }
+      await saveJob(jobRole, qualifications, responsibilities, about);
+      showToast("Job posted successfully");
+      router.replace("employer/employerHome");
     } catch (e) {
       console.error("Error posting job: ", e);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
+    <SafeAreaView style={globalStyles.container}>
       <ScrollView
         style={{ padding: 16 }}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={[
+          globalStyles.scrollViewContent,
+          {
+            justifyContent: "center",
+          },
+        ]}
       >
+        <Text style={{ fontSize: 24, marginBottom: 20, alignSelf: "center" }}>
+          Create a Job Posting
+        </Text>
         <AppTextInput
-          IconComponent={() => <Feather name="user" size={24} color="black" />}
+          iconName={"person-outline"}
           placeholder={"Enter your Job Role here"}
           onChangeText={setJobRole}
         />
         <AppTextInput
-          IconComponent={() => (
-            <MaterialCommunityIcons
-              name="school-outline"
-              size={24}
-              color="black"
-            />
-          )}
+          iconName={"school-outline"}
           multiline={true}
           placeholder={"Enter your Qualifications here"}
           onChangeText={setQualifications}
         />
         <AppTextInput
-          IconComponent={() => (
-            <AntDesign name="form" size={24} color="black" />
-          )}
+          iconName={"build-outline"}
           multiline={true}
           placeholder={"Enter your Responsibilities here"}
           onChangeText={setResponsibilities}
         />
         <AppTextInput
-          IconComponent={() => (
-            <SimpleLineIcons name="info" size={24} color="black" />
-          )}
+          iconName={"information-circle-outline"}
           multiline={true}
           placeholder={"Enter your About here"}
           onChangeText={setAbout}
         />
-        <TouchableOpacity style={styles.btn} onPress={handleSubmit}>
-          <Text style={styles.btnText}>Submit</Text>
-        </TouchableOpacity>
+        <AppButton loading={loading} onPress={handleSubmit} title={"Submit"} />
       </ScrollView>
       <BottomBar navigation={navigation} />
-    </>
+    </SafeAreaView>
   );
 }
 
