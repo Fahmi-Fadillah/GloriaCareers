@@ -43,13 +43,9 @@
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "react-native-dotenv": "^3.4.8"
   },
-  "resolutions": {
-    "metro": "^0.73.10",
-    "metro-resolver": "^0.73.10"
-  },
   "overrides": {
-    "metro": "^0.73.10",
-    "metro-resolver": "^0.73.10"
+    "metro": "~0.80.8",
+    "metro-resolver": "~0.80.8"
   },
   "name": "jobcentral",
   "version": "1.0.0",
