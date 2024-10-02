@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { getAuth, signOut } from "firebase/auth";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -7,50 +7,24 @@ import icons from "../constants/icons";
 import { showToast } from "../utils/index";
 import ScreenHeaderBtn from "./common/header/ScreenHeaderBtn";
 
-const AppHeader = ({ title, onBackPress }) => {
+const AppHeader = ({ title, onBackPress, routingOptions }) => {
+  const router = useRouter();
+
   return (
     <View style={styles.headerContainer}>
       <ScreenHeaderBtn
         iconUrl={icons.menu}
         dimension="60%"
-        options={[
-          {
-            label: "My Profile",
-            icon: "account",
-            action: () => showToast("Profile Coming Soon"),
+        options={routingOptions.map((option) => ({
+          ...option,
+          action: () => {
+            if (option.action) {
+              option.action();
+            } else if (option.route) {
+              router.push(option.route);
+            }
           },
-          {
-            label: "Saved Jobs",
-            icon: "content-save",
-            action: () => router.push("likedJobs"),
-          },
-          {
-            label: "About Us",
-            icon: "information",
-            action: () => router.push("about"),
-          },
-          {
-            label: "Settings",
-            icon: "wrench",
-            action: () => showToast("Settings Coming Soon"),
-          },
-          {
-            label: "Logout",
-            icon: "exit-to-app",
-            action: () => {
-              const auth = getAuth();
-              signOut(auth)
-                .then(() => {
-                  console.log("User signed out");
-                  // router.push("auth");
-                })
-                .catch((error) => {
-                  // An error happened.
-                  console.log("Error signing out: ", error);
-                });
-            },
-          },
-        ]}
+        }))}
         showModal={true}
       />
       <Text style={styles.headerText}>{title}</Text>

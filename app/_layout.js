@@ -14,37 +14,37 @@ const Layout = () => {
     DMRegular: require("../assets/fonts/DMSans-Regular.ttf"),
   });
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const employerDoc = await getDoc(doc(db, "employers", user.uid));
-        if (employerDoc.exists()) {
-          console.log("You are an employer");
-          router.push("employer/employerHome");
-        } else {
-          const jobSeekerDoc = await getDoc(doc(db, "seekers", user.uid));
-          if (jobSeekerDoc.exists()) {
-            console.log("You are a job seeker");
-            router.push("home");
-          } else {
-            console.log("User type not identified");
-            router.push("auth");
-          }
-        }
-      } else {
-        console.log("You are not signed in");
-        router.navigate("auth");
-      }
-    });
-    setIsMounted(true);
-    return () => unsubscribe();
-  }, [router]);
+  // const [isMounted, setIsMounted] = useState(false);
+  // useEffect(() => {
+  //   const auth = getAuth();
+  //   const unsubscribe = onAuthStateChanged(auth, async (user) => {
+  //     if (user) {
+  //       const employerDoc = await getDoc(doc(db, "employers", user.uid));
+  //       if (employerDoc.exists()) {
+  //         console.log("You are an employer");
+  //         router.push("employer/employerHome");
+  //       } else {
+  //         const jobSeekerDoc = await getDoc(doc(db, "seekers", user.uid));
+  //         if (jobSeekerDoc.exists()) {
+  //           console.log("You are a job seeker");
+  //           router.push("home");
+  //         } else {
+  //           console.log("User type not identified");
+  //           router.push("auth");
+  //         }
+  //       }
+  //     } else {
+  //       console.log("You are not signed in");
+  //       router.navigate("auth");
+  //     }
+  //   });
+  //   setIsMounted(true);
+  //   return () => unsubscribe();
+  // }, [router]);
 
-  if (!isMounted) {
-    return null; // or a loading spinner
-  }
+  // if (!isMounted) {
+  //   return null; // or a loading spinner
+  // }
 
   if (!fontsLoaded) {
     return (
@@ -74,6 +74,10 @@ const Layout = () => {
         <Stack.Screen name="employer/[id]" options={{ headerShown: false }} />
         <Stack.Screen
           name="employer/employerProfile"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="employer/employerHome"
           options={{ headerShown: false }}
         />
       </Stack>

@@ -10,6 +10,7 @@ import AppHeader from "../components/AppHeader";
 import EmployerJobs from "../components/home/employerJobs/EmployerJobs";
 import { globalStyles } from "../styles/styles";
 import { showToast } from "../utils";
+import { handlelogOut } from "../utils/firebaseAuth";
 const Home = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,9 +35,37 @@ const Home = () => {
     return null;
   }
 
+  const routingOptions = [
+    {
+      label: "My Profile",
+      icon: "account",
+      action: () => showToast("Profile Coming Soon"),
+    },
+    {
+      label: "Saved Jobs",
+      icon: "content-save",
+      route: "likedJobs",
+    },
+    {
+      label: "About Us",
+      icon: "information",
+      route: "about",
+    },
+    {
+      label: "Settings",
+      icon: "wrench",
+      action: () => showToast("Settings Coming Soon"),
+    },
+    {
+      label: "Logout",
+      icon: "exit-to-app",
+      action: handlelogOut,
+    },
+  ];
+
   return (
     <SafeAreaView style={globalStyles.container}>
-      <AppHeader />
+      <AppHeader routingOptions={routingOptions} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={globalStyles.scrollViewContent}

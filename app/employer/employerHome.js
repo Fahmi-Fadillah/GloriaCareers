@@ -1,19 +1,17 @@
 import { useNavigation } from "@react-navigation/native";
-import { Stack, useRouter } from "expo-router";
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { useRouter } from "expo-router";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, View } from "react-native";
-import profileIcon from "../../assets/icon2.png";
-import {
-  Nearbyjobs,
-  Popularjobs,
-  ScreenHeaderBtn,
-  Welcome,
-} from "../../components";
+import { ScrollView, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Nearbyjobs, Popularjobs, Welcome } from "../../components";
+import AppHeader from "../../components/AppHeader";
 import BottomBar from "../../components/BottomBar";
 import EmployerJobs from "../../components/home/employerJobs/EmployerJobs";
-import { COLORS, icons, SIZES } from "../../constants";
+import { SIZES } from "../../constants";
+import { globalStyles } from "../../styles/styles";
 import { showToast } from "../../utils";
+import { handlelogOut } from "../../utils/firebaseAuth";
 
 const employerHome = () => {
   const router = useRouter();
@@ -30,7 +28,6 @@ const employerHome = () => {
         setIsSignedIn(false);
       }
     });
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
@@ -38,71 +35,37 @@ const employerHome = () => {
     return null;
   }
 
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.lightWhite }}>
-      <Stack.Screen
-        options={{
-          headerStyle: { backgroundColor: COLORS.lightWhite },
-          headerShadowVisible: false,
-          headerLeft: () => (
-            <ScreenHeaderBtn
-              iconUrl={icons.menu}
-              dimension="60%"
-              options={[
-                {
-                  label: "Employer Profile",
-                  icon: "account",
-                  action: () => navigation.navigate("employer/employerProfile"),
-                },
-                {
-                  label: "Saved Jobs",
-                  icon: "content-save",
-                  action: () => navigation.navigate("likedJobs"),
-                },
-                {
-                  label: "About Us",
-                  icon: "information",
-                  action: () => navigation.navigate("about"),
-                },
-                {
-                  label: "Settings",
-                  icon: "wrench",
-                  action: () => showToast("Settings Coming Soon"),
-                },
-                {
-                  label: "Logout",
-                  icon: "exit-to-app",
-                  action: () => {
-                    const auth = getAuth();
-                    signOut(auth)
-                      .then(() => {
-                        // Sign-out successful.
+  const routingOptions = [
+    {
+      label: "Employer Profile",
+      icon: "account",
+      route: "employer/employerProfile",
+    },
+    {
+      label: "Saved Jobs",
+      icon: "content-save",
+      route: "likedJobs",
+    },
+    {
+      label: "About Us",
+      icon: "information",
+      route: "about",
+    },
+    {
+      label: "Settings",
+      icon: "wrench",
+      action: () => showToast("Settings Coming Soon"),
+    },
+    {
+      label: "Logout",
+      icon: "exit-to-app",
+      action: handlelogOut,
+    },
+  ];
 
-                        console.log("User signed out");
-                        // navigation.navigate("auth");
-                      })
-                      .catch((error) => {
-                        // An error happened.
-                        console.log("Error signing out: ", error);
-                      });
-                  },
-                },
-              ]}
-              showModal={true}
-            />
-          ),
-          headerRight: () => (
-            <ScreenHeaderBtn
-              iconUrl={profileIcon}
-              dimension="100%"
-              options={[]}
-              showModal={false}
-              handlePress={() => showToast("Profile Coming Soon")}
-            />
-          ),
-          headerTitle: "",
-        }}
-      />
+  return (
+    <SafeAreaView style={globalStyles.container}>
+      <AppHeader routingOptions={routingOptions} />
       <View style={{ flex: 1, flexDirection: "column" }}>
         <ScrollView
           showsVerticalScrollIndicator={false}

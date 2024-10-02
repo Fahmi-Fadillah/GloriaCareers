@@ -1,9 +1,11 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../app/firebase";
+import { useRouter } from "expo-router";
 
 export const handleSignIn = async (email, password) => {
   try {
@@ -74,5 +76,19 @@ export const handleUserSignUp = async (email, password, name) => {
   } catch (error) {
     console.log(error);
     throw error;
+  }
+};
+
+export const handlelogOut = async () => {
+  const auth = getAuth();
+  const router = useRouter();
+  try {
+    await signOut(auth);
+    console.log("User signed out");
+    showToast("User signed out");
+    router.replace("auth");
+  } catch (error) {
+    console.log("Error signing out: ", error);
+    showToast("Error signing out");
   }
 };
