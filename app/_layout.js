@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { db } from "./firebase";
 import { RootSiblingParent } from "react-native-root-siblings";
+import JobApplicants from "./employer/jobApplicants";
 
 const Layout = () => {
   const [fontsLoaded] = useFonts({
@@ -79,6 +80,12 @@ const Layout = () => {
         <Stack.Screen
           name="employer/employerHome"
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="employer/jobApplicants"
+          options={{
+            headerShown: false,
+          }}
         />
       </Stack>
     </RootSiblingParent>

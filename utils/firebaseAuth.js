@@ -13,8 +13,10 @@ import {
   doc,
   getDoc,
   getDocs,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { auth, db } from "../app/firebase";
 import { showToast } from "../utils/index";
@@ -122,6 +124,7 @@ export const saveJob = async (
       about: about,
       employerId: auth.currentUser.uid,
       companyName: companyName,
+      applicants: [],
     });
     const jobId = jobDocRef.id;
     await updateDoc(jobDocRef, { id: jobId });
@@ -219,6 +222,9 @@ export const applyForJob = async (jobId) => {
       await updateDoc(userDocRef, {
         appliedJobs: arrayUnion(jobId),
       });
+      await updateDoc(jobDocRef, {
+        applicants: arrayUnion(userId),
+      });
       showToast("Job applied successfully");
       return true;
     }
@@ -258,4 +264,46 @@ export const removeLikedJob = async (jobId) => {
   await updateDoc(userDocRef, {
     savedJobs: arrayRemove(jobId),
   });
+};
+
+export const fetchApplicants = async () => {
+  try {
+    const auth = getAuth();
+    const employerId = auth.currentUser.uid;
+    const jobsQuery = query(
+      collection(db, "jobs"),
+      where("employerId", "==", employerId)
+    );
+    const jobsSnapshot = await getDocs(jobsQuery);
+    const jobsList = [];
+
+    for (const jobDoc of jobsSnapshot.docs) {
+      const jobData = jobDoc.data();
+      const jobId = jobDoc.id;
+      const applicantsList = [];
+
+      const applicantsIds = jobData.applicants || [];
+      for (const applicantId of applicantsIds) {
+        const applicantDocRef = doc(db, "seekers", applicantId);
+        const applicantDocSnap = await getDoc(applicantDocRef);
+        if (applicantDocSnap.exists()) {
+          applicantsList.push({
+            id: applicantId,
+            ...applicantDocSnap.data(),
+          });
+        }
+      }
+
+      jobsList.push({
+        id: jobId,
+        ...jobData,
+        applicants: applicantsList,
+      });
+    }
+
+    return jobsList;
+  } catch (error) {
+    console.error("Error fetching applicants: ", error);
+    throw error;
+  }
 };

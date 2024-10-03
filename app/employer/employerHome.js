@@ -44,7 +44,7 @@ const employerHome = () => {
     {
       label: "Saved Jobs",
       icon: "content-save",
-      route: "likedJobs",
+      route: "employer/jobApplicants",
     },
     {
       label: "About Us",
@@ -69,7 +69,10 @@ const employerHome = () => {
       <View style={{ flex: 1, flexDirection: "column" }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{ paddingBottom: 60 }}
+          contentContainerStyle={[
+            globalStyles.scrollViewContent,
+            { paddingBottom: 60 },
+          ]}
         >
           <View
             style={{

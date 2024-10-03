@@ -9,6 +9,7 @@ export const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.lightWhite,
+    marginTop: 10,
   },
   scrollViewContent: {
     flexGrow: 1,
