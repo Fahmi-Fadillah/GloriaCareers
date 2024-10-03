@@ -1,9 +1,8 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  RefreshControl,
   SafeAreaView,
   ScrollView,
   Text,
@@ -64,11 +63,11 @@ const JobDetails = () => {
     fetchJobDetails();
   }, [userId]);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    refetch();
-    setRefreshing(false);
-  }, [userId, params.id]);
+  // const onRefresh = useCallback(() => {
+  //   setRefreshing(true);
+  //   refetch();
+  //   setRefreshing(false);
+  // }, [userId, params.id]);
 
   const displayTabContent = () => {
     switch (activeTab) {
@@ -159,9 +158,9 @@ const JobDetails = () => {
       <>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
+          // refreshControl={
+          //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          // }
         >
           {isLoading ? (
             <ActivityIndicator size="large" color={COLORS.primary} />
@@ -195,6 +194,7 @@ const JobDetails = () => {
             "https://careers.google.com/jobs/results/"
           }
           onLike={handleLike}
+          hideBookmark={true}
           isLiked={isLiked}
         />
       </>

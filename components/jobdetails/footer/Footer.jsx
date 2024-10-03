@@ -3,7 +3,7 @@ import { Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { SIZES } from '../../../constants';
 import { applyForJob } from '../../../utils/firebaseAuth';
 import styles from "./footer.style";
-const Footer = ({ url, onLike, isLiked, isApplied, jobId, isEmployerPage }) => {
+const Footer = ({ url, onLike, isLiked, isApplied, jobId, isEmployerPage, hideBookmark }) => {
 
 
   const handleLikeButtonPress = () => {
@@ -19,14 +19,14 @@ const Footer = ({ url, onLike, isLiked, isApplied, jobId, isEmployerPage }) => {
   };
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.likeBtn} onPress={handleLikeButtonPress} >
+      {!hideBookmark && <TouchableOpacity style={styles.likeBtn} onPress={handleLikeButtonPress} >
         {
           isLiked ?
             <Ionicons name="bookmark" size={32} color="#6EACDA" />
             :
             <Ionicons name="bookmark-outline" size={32} color="#6EACDA" />
         }
-      </TouchableOpacity>
+      </TouchableOpacity>}
 
       <TouchableOpacity
         style={isApplied ? styles2.appliedBtn : styles.applyBtn}
@@ -46,7 +46,7 @@ const styles2 = StyleSheet.create({
     backgroundColor: "#ccc",
     padding: 12,
     borderRadius: 8,
-    height: "100%",
+    height: 55,
     justifyContent: "center",
     alignItems: "center",
     marginLeft: SIZES.medium,
