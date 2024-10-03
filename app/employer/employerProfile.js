@@ -1,6 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
-import { router, Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -28,7 +27,7 @@ import {
   updateEmployerData,
 } from "../../utils/firebaseAuth";
 function EmployerProfile(props) {
-  const navigation = useNavigation();
+  const router = useRouter();
   const [employerData, setEmployerData] = useState(null);
   const [createdJobs, setCreatedJobs] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -187,7 +186,7 @@ function EmployerProfile(props) {
           </>
         )}
       </ScrollView>
-      <BottomBar navigation={navigation} />
+      <BottomBar router={router} />
     </SafeAreaView>
   );
 }

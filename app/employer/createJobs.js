@@ -1,7 +1,6 @@
-import { useNavigation } from "@react-navigation/native";
 import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeaderBtn } from "../../components";
 import AppButton from "../../components/AppButton";
@@ -13,7 +12,6 @@ import { saveJob } from "../../utils/firebaseAuth";
 import { showToast } from "../../utils/index";
 
 function createJobs() {
-  const navigation = useNavigation();
   const router = useRouter();
   const [jobRole, setJobRole] = useState("");
   const [qualifications, setQualifications] = useState("");
@@ -60,9 +58,6 @@ function createJobs() {
         style={{ padding: 16 }}
         contentContainerStyle={[globalStyles.scrollViewContent, {}]}
       >
-        <Text style={{ fontSize: 24, marginBottom: 20, alignSelf: "center" }}>
-          Create a Job Posting
-        </Text>
         <AppTextInput
           iconName={"person-outline"}
           placeholder={"Enter your Job Role here"}
@@ -88,7 +83,7 @@ function createJobs() {
         />
         <AppButton loading={loading} onPress={handleSubmit} title={"Submit"} />
       </ScrollView>
-      <BottomBar navigation={navigation} />
+      <BottomBar router={router} />
     </SafeAreaView>
   );
 }

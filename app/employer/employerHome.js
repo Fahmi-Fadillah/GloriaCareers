@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -16,7 +15,6 @@ import { handlelogOut } from "../../utils/firebaseAuth";
 const employerHome = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const navigation = useNavigation();
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
@@ -95,7 +93,7 @@ const employerHome = () => {
             <Nearbyjobs />
           </View>
         </ScrollView>
-        <BottomBar navigation={navigation} />
+        <BottomBar router={router} />
       </View>
     </SafeAreaView>
   );

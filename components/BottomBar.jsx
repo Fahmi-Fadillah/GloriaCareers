@@ -3,12 +3,13 @@ import { useRoute } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '../constants';
+import { useRouter } from "expo-router";
 
-const BottomBar = ({ navigation }) => {
+const BottomBar = ({ router }) => {
     const route = useRoute();
 
     const handlePress = (screenName) => {
-        navigation.navigate(screenName);
+        router.push(screenName);
     };
 
     return (
