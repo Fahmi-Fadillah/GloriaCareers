@@ -67,7 +67,7 @@ const Layout = () => {
         <Stack.Screen options={{ header: () => null }} name="auth" />
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="home" options={{ headerShown: false }} />
-        <Stack.Screen name="about" options={{ headerShown: false }} />
+        <Stack.Screen name="about" options={{ headerShown: true }} />
         <Stack.Screen
           name="employer/createJobs"
           options={{ headerShown: false }}

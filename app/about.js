@@ -1,9 +1,19 @@
 import { Stack, useRouter } from "expo-router";
 import React from "react";
-import { Linking, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Icon } from "react-native-elements";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Logo from "../assets/icon.png";
 import { ScreenHeaderBtn } from "../components";
 import { COLORS, icons } from "../constants";
+import { globalStyles } from "../styles/styles";
 
 function About(props) {
   const router = useRouter();
@@ -11,38 +21,40 @@ function About(props) {
     {
       name: "Kapil Badokar",
       social: "https://www.linkedin.com/in/kapil-badokar/",
-      about: "This is .",
+      role: "Lead Developer",
+      bio: "Kapil is a seasoned developer with a passion for building scalable applications.",
     },
     {
       name: "Mohanish Desale",
       social: "https://www.linkedin.com/in/mohanish-desale/",
-      about: "This is Mohanish Desale.",
+      role: "Backend Developer",
+      bio: "Mohanish specializes in backend development and database management.",
     },
     {
       name: "Chinmay Rathod",
       social: "https://www.linkedin.com/in/chinmayy19/",
-      about: "This is Developer 3.",
+      role: "Frontend Developer",
+      bio: "Chinmay is an expert in creating intuitive and responsive user interfaces.",
     },
   ];
 
-  const appSocialLinks = [
-    {
-      name: "Facebook",
-      url: "https://facebook.com/app",
-      type: "font-awesome",
-      icon: "facebook",
-    },
-    {
-      name: "Twitter",
-      url: "https://twitter.com/app",
-      type: "font-awesome",
-      icon: "twitter",
-    },
-    //  more social links as needed
+  const appFeatures = [
+    "Centralized job listings from various sources",
+    "Personalized job recommendations",
+    "Real-time job alerts and notifications",
+    "Easy application tracking",
+    "Seamless navigation and user experience",
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.lightWhite }}>
+    <SafeAreaView
+      style={[
+        globalStyles.container,
+        {
+          marginTop: 0,
+        },
+      ]}
+    >
       <Stack.Screen
         options={{
           headerStyle: { backgroundColor: COLORS.lightWhite },
@@ -54,37 +66,70 @@ function About(props) {
               handlePress={() => router.back()}
             />
           ),
-          headerTitle: "",
+          headerTitle: "About Us",
+          headerTitleAlign: "center",
+          headerTitleStyle: { fontSize: 22, fontWeight: "bold" },
         }}
       />
 
-      <Text style={styles.title}>About</Text>
-      <Text numberOfLines={0} style={styles.paragraph}>
-        Welcome to JobCentral, your ultimate destination for simplified job
-        searching!{"\n"}At JobCentral, we believe in making the job search
-        process effortless and efficient for users worldwide.{"\n"}Our
-        centralized platform aggregates job listings from various sources,
-        providing you with a comprehensive database of opportunities.{"\n"}
-        Whether you're a seasoned professional or a fresh graduate, JobCentral
-        offers intuitive features, personalized recommendations, and seamless
-        navigation to help you find your dream job.
-      </Text>
+      <ScrollView contentContainerStyle={[styles.scrollViewContent]}>
+        <Image source={Logo} resizeMode="contain" style={styles.headerImage} />
+        <Text style={styles.title}>Welcome to JobCentral</Text>
+        <Text style={styles.paragraph}>
+          Your ultimate destination for simplified job searching! At JobCentral,
+          we believe in making the job search process effortless for users
+          worldwide. Our centralized platform aggregates job listings from
+          various sources, providing you with a comprehensive database of
+          opportunities. Whether you're a seasoned professional or a fresh
+          graduate, JobCentral offers intuitive features, personalized
+          recommendations, and seamless navigation to help you find your dream
+          job.
+        </Text>
 
-      <Text style={styles.subtitle}>Developers</Text>
-      {developers.map((dev, index) => (
-        <View key={index} style={styles.devContainer}>
-          <Text style={styles.devName}>{dev.name}</Text>
-          {/* <Text style={styles.devAbout}>{dev.about}</Text> */}
-          <Icon
-            name="linkedin-square"
-            type="font-awesome"
-            size={28}
-            color={"blue"}
-            onPress={() => Linking.openURL(dev.social)}
-            style={{ marginRight: 10 }}
-          />
-        </View>
-      ))}
+        <Text style={styles.subtitle}>Key Features</Text>
+        {appFeatures.map((feature, index) => (
+          <Text key={index} style={styles.featureItem}>
+            - {feature}
+          </Text>
+        ))}
+
+        <Text
+          style={[
+            styles.subtitle,
+            {
+              paddingTop: 20,
+            },
+          ]}
+        >
+          Meet the Developers
+        </Text>
+        {developers.map((dev, index) => (
+          <View key={index} style={styles.devContainer}>
+            <Text style={styles.devName}>{dev.name}</Text>
+            <Text style={styles.devRole}>{dev.role}</Text>
+            <Text style={styles.devBio}>{dev.bio}</Text>
+            <Icon
+              name="linkedin-square"
+              type="font-awesome"
+              size={28}
+              color={"blue"}
+              onPress={() => Linking.openURL(dev.social)}
+              style={{ marginRight: 10 }}
+            />
+          </View>
+        ))}
+        <Text
+          style={[
+            styles.subtitle,
+            {
+              fontSize: 14,
+              color: "gray",
+            },
+          ]}
+        >
+          Copyright © JobCentral{" "}
+        </Text>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -92,11 +137,17 @@ function About(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: "#fff",
   },
+  scrollViewContent: {
+    padding: 20,
+  },
+  headerImage: {
+    width: "100%",
+    height: 150,
+  },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
@@ -104,45 +155,65 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 22,
     fontWeight: "bold",
-    marginTop: 23,
     marginBottom: 10,
     textAlign: "center",
   },
-  devContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: COLORS.lightWhite,
-    marginBottom: 10,
+  paragraph: {
+    lineHeight: 25,
+    fontSize: 17,
+    fontWeight: "400",
+    marginBottom: 20,
+    textAlign: "justify",
+    backgroundColor: "#f0f0f0",
     padding: 10,
+    paddingHorizontal: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 1,
     borderRadius: 5,
-    height: 50,
-    // backgroundColor: "#f0f0f0",
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 1 },
-    // shadowOpacity: 0.3,
-    // shadowRadius: 2,
+  },
+  featureItem: {
+    fontSize: 17,
+    marginBottom: 10,
+  },
+  devContainer: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    backgroundColor: "#f0f0f0",
+    marginBottom: 20,
+    padding: 15,
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
     elevation: 1,
   },
   devName: {
     fontSize: 18,
-    flex: 1,
-    marginRight: 10,
+    fontWeight: "bold",
+    marginBottom: 5,
   },
-  devAbout: {
+  devRole: {
+    fontSize: 16,
+    fontStyle: "italic",
+    marginBottom: 5,
+  },
+  devBio: {
     fontSize: 14,
+    marginBottom: 10,
+  },
+  contactItem: {
+    fontSize: 17,
     marginBottom: 10,
   },
   socialContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-  },
-  paragraph: {
-    fontSize: 17,
-    fontWeight: "400",
     marginBottom: 20,
-    textAlign: "left",
-    backgroundColor: COLORS.lightWhite,
-    padding: 10,
   },
 });
+
 export default About;
