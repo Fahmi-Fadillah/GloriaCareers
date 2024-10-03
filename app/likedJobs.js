@@ -1,46 +1,52 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeaderBtn } from "../components";
 import { COLORS, icons } from "../constants";
-import { auth, db } from "./firebase";
+import { globalStyles } from "../styles/styles";
+import { showToast } from "../utils";
+import { fetchLikedJobs, removeLikedJob } from "../utils/firebaseAuth";
 
 const LikedJobsScreen = () => {
   const [likedJobs, setLikedJobs] = useState([]);
+  const [isLoading, setisLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    fetchLikedJobs();
+    loadLikedJobs();
   }, []);
 
-  const fetchLikedJobs = async () => {
-    const userId = auth.currentUser.uid;
-    const likedJobsRef = collection(db, `likedJobs/${userId}/jobs`);
-    const likedJobsSnapshot = await getDocs(likedJobsRef);
-    const likedJobsList = likedJobsSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    setLikedJobs(likedJobsList);
+  const loadLikedJobs = async () => {
+    setisLoading(true);
+    try {
+      const likedJobsList = await fetchLikedJobs();
+      setLikedJobs(likedJobsList);
+    } catch (error) {
+      console.error(error.message);
+    } finally {
+      setisLoading(false);
+    }
   };
 
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
+
   return (
-    <>
+    <SafeAreaView style={globalStyles.container}>
       <Stack.Screen
         options={{
           headerStyle: { backgroundColor: COLORS.lightWhite },
@@ -63,19 +69,8 @@ const LikedJobsScreen = () => {
             <>
               <TouchableOpacity
                 style={styles.jobItem}
-                onPress={async () => {
-                  const userId = auth.currentUser.uid;
-                  const jobRef = doc(db, `likedJobs/${userId}/jobs`, item.id);
-                  const jobSnapshot = await getDoc(jobRef);
-                  console.log(item);
-                  if (jobSnapshot.exists()) {
-                    const jobData = jobSnapshot.data();
-                    if (jobData.type === "employer") {
-                      router.push(`/employer/${item.jobId}`);
-                    } else if (jobData.type === "api") {
-                      router.push(`/job-details/${item.jobId}`);
-                    }
-                  }
+                onPress={() => {
+                  router.push(`/employer/${item.id}`);
                 }}
               >
                 {/* 
@@ -90,48 +85,56 @@ const LikedJobsScreen = () => {
                   style={{ width: 50, height: 50 }}
                 /> */}
                 <View>
-                  <Text style={styles.jobTitle}>{item.jobTitle}</Text>
-                  <Text style={styles.employerName}>{item.employerName}</Text>
-                  <Text style={styles.employerName}>{item.jobCountry}</Text>
+                  <Text style={styles.jobTitle}>{item.jobRole}</Text>
+                  <Text style={styles.employerName}>{item.companyName}</Text>
+                  <Text style={styles.employerName}>{item.location}</Text>
+                  {item.isApplied ? (
+                    <Text style={styles.appliedStatus}>Applied</Text>
+                  ) : (
+                    <Text style={styles.notAppliedStatus}>Not Applied</Text>
+                  )}
                 </View>
                 <TouchableOpacity
                   onPress={async () => {
-                    const userId = auth.currentUser.uid;
-                    const likedJobRef = doc(
-                      db,
-                      `likedJobs/${userId}/jobs`,
-                      item.id
-                    );
-                    await deleteDoc(likedJobRef);
-                    // Fetch the updated list of liked jobs
-                    fetchLikedJobs();
+                    await removeLikedJob(item.id);
+                    showToast("Job removed from liked jobs");
+                    loadLikedJobs();
                   }}
                 >
-                  <Ionicons name="trash-outline" size={24} color="red" />
+                  <Ionicons
+                    name="remove-circle-outline"
+                    size={28}
+                    color="red"
+                  />
                 </TouchableOpacity>
               </TouchableOpacity>
             </>
           )}
         />
       </View>
-    </>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    paddingHorizontal: 20,
     backgroundColor: "#f8f8f8",
   },
   jobItem: {
     backgroundColor: "#fff",
-    marginBottom: 10,
+    marginBottom: 20,
     padding: 10,
     borderRadius: 5,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   jobTitle: {
     fontSize: 18,
@@ -140,6 +143,18 @@ const styles = StyleSheet.create({
   employerName: {
     fontSize: 16,
     color: "#888",
+  },
+  appliedStatus: {
+    fontSize: 14,
+    color: "green",
+  },
+  notAppliedStatus: {
+    fontSize: 14,
+    color: "red",
+  },
+  likedStatus: {
+    fontSize: 14,
+    color: "blue",
   },
 });
 

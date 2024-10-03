@@ -7,6 +7,7 @@ import {
 } from "firebase/auth";
 import {
   addDoc,
+  arrayRemove,
   arrayUnion,
   collection,
   doc,
@@ -224,4 +225,37 @@ export const applyForJob = async (jobId) => {
   } else {
     throw new Error("User document does not exist");
   }
+};
+
+export const fetchLikedJobs = async () => {
+  const userId = auth.currentUser.uid;
+  const userDocRef = doc(db, `seekers`, userId);
+  const userDocSnap = await getDoc(userDocRef);
+
+  if (userDocSnap.exists()) {
+    const likedJobsIds = userDocSnap.data().savedJobs || [];
+    const likedJobsList = [];
+
+    for (const jobId of likedJobsIds) {
+      const jobDetails = await fetchJobDetails(jobId);
+      likedJobsList.push({
+        id: jobId,
+        ...jobDetails.job,
+        isLiked: jobDetails.isLiked,
+        isApplied: jobDetails.isApplied,
+      });
+    }
+
+    return likedJobsList;
+  } else {
+    throw new Error("User document does not exist");
+  }
+};
+
+export const removeLikedJob = async (jobId) => {
+  const userId = auth.currentUser.uid;
+  const userDocRef = doc(db, `seekers`, userId);
+  await updateDoc(userDocRef, {
+    savedJobs: arrayRemove(jobId),
+  });
 };
