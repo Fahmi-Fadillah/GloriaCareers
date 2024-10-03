@@ -1,8 +1,7 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useEffect, useState } from 'react';
 import { Animated, Image, Modal, Text, TouchableHighlight, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from "./screenheader.style";
-
 const ScreenHeaderBtn = ({ iconUrl, dimension, handlePress, options, showModal }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const handleButtonPress = () => {
@@ -46,8 +45,8 @@ const ScreenHeaderBtn = ({ iconUrl, dimension, handlePress, options, showModal }
                       option.action();
                     }}
                   >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                      <MaterialCommunityIcons name={option.icon} size={30} color="black" />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 5 }}>
+                      <Ionicons name={option.icon} size={30} color="black" />
                       <Text style={styles.textStyle}>{option.label}</Text>
                     </View>
                   </TouchableHighlight>

@@ -88,6 +88,7 @@ const Layout = () => {
           }}
         />
         <Stack.Screen name="likedJobs" options={{ headerShown: true }} />
+        <Stack.Screen name="profile" options={{ headerShown: true }} />
       </Stack>
     </RootSiblingParent>
   );

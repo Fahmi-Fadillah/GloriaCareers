@@ -38,27 +38,27 @@ const employerHome = () => {
   const routingOptions = [
     {
       label: "Employer Profile",
-      icon: "account",
+      icon: "person-outline",
       route: "employer/employerProfile",
     },
     {
       label: "Saved Jobs",
-      icon: "content-save",
+      icon: "bookmark-outline",
       route: "employer/jobApplicants",
     },
     {
       label: "About Us",
-      icon: "information",
+      icon: "information-circle-outline",
       route: "about",
     },
     {
       label: "Settings",
-      icon: "wrench",
+      icon: "settings-outline",
       action: () => showToast("Settings Coming Soon"),
     },
     {
       label: "Logout",
-      icon: "exit-to-app",
+      icon: "log-out-outline",
       action: handlelogOut,
     },
   ];

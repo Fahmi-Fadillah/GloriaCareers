@@ -38,27 +38,27 @@ const Home = () => {
   const routingOptions = [
     {
       label: "My Profile",
-      icon: "account",
-      action: () => showToast("Profile Coming Soon"),
+      icon: "person-outline",
+      route: "profile",
     },
     {
       label: "Saved Jobs",
-      icon: "content-save",
+      icon: "bookmark-outline",
       route: "likedJobs",
     },
     {
       label: "About Us",
-      icon: "information",
+      icon: "information-circle-outline",
       route: "about",
     },
     {
       label: "Settings",
-      icon: "wrench",
+      icon: "settings-outline",
       action: () => showToast("Settings Coming Soon"),
     },
     {
       label: "Logout",
-      icon: "exit-to-app",
+      icon: "log-out-outline",
       action: handlelogOut,
     },
   ];

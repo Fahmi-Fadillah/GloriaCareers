@@ -364,3 +364,31 @@ export const updateEmployerData = async (userId, formData) => {
   const docRef = doc(db, "employers", userId);
   await updateDoc(docRef, formData);
 };
+
+export const fetchSeekerData = async (userId) => {
+  const docRef = doc(db, "seekers", userId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    return docSnap.data();
+  } else {
+    throw new Error("No such document!");
+  }
+};
+
+export const fetchAppliedJobs = async (jobIds) => {
+  const jobs = [];
+  for (const jobId of jobIds) {
+    const jobDocRef = doc(db, "jobs", jobId);
+    const jobDocSnap = await getDoc(jobDocRef);
+    if (jobDocSnap.exists()) {
+      jobs.push(jobDocSnap.data());
+    }
+  }
+  return jobs;
+};
+
+export const updateSeekerData = async (userId, formData) => {
+  const docRef = doc(db, "seekers", userId);
+  await updateDoc(docRef, formData);
+};
