@@ -1,7 +1,16 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { router, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../../app/firebase";
 import Logo from "../../assets/icon.png";
@@ -15,14 +24,16 @@ import { showToast } from "../../utils";
 import {
   fetchCreatedJobs,
   fetchEmployerData,
+  handlelogOut,
   updateEmployerData,
 } from "../../utils/firebaseAuth";
-
 function EmployerProfile(props) {
   const navigation = useNavigation();
   const [employerData, setEmployerData] = useState(null);
   const [createdJobs, setCreatedJobs] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setloading] = useState(true);
+  const [btnLoading, setbtnLoading] = useState(false);
   const [formData, setFormData] = useState({
     companyName: "",
     companyLocation: "",
@@ -45,6 +56,8 @@ function EmployerProfile(props) {
         setCreatedJobs(jobs);
       } catch (error) {
         console.log(error);
+      } finally {
+        setloading(false);
       }
     };
 
@@ -56,6 +69,7 @@ function EmployerProfile(props) {
   };
 
   const handleSave = async () => {
+    setbtnLoading(true);
     try {
       await updateEmployerData(auth.currentUser.uid, formData);
       console.log("Document updated successfully!");
@@ -64,12 +78,22 @@ function EmployerProfile(props) {
       setIsEditing(false);
     } catch (error) {
       console.log(error);
+    } finally {
+      setbtnLoading(false);
     }
   };
 
   const handleChange = (name, value) => {
     setFormData({ ...formData, [name]: value });
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={globalStyles.container}>
@@ -83,6 +107,18 @@ function EmployerProfile(props) {
               dimension="60%"
               handlePress={() => router.back()}
             />
+          ),
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={handlelogOut}
+              style={{ marginRight: 10 }}
+            >
+              <Ionicons
+                name="log-out-outline"
+                size={30}
+                color={COLORS.tertiary}
+              />
+            </TouchableOpacity>
           ),
           headerTitle: "Profile",
           headerTitleAlign: "center",
@@ -134,6 +170,7 @@ function EmployerProfile(props) {
                 title={isEditing ? "Save" : "Edit Profile"}
                 onPress={isEditing ? handleSave : handleEditToggle}
                 style={styles.customBtn}
+                loading={btnLoading}
               />
             </View>
             <Text style={styles.sectionTitle}>Created Jobs</Text>
