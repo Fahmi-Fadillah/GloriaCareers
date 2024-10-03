@@ -7,9 +7,9 @@ import {
 } from "react-native";
 import { COLORS } from "../constants";
 
-const AppButton = ({ onPress, title, loading }) => {
+const AppButton = ({ onPress, title, loading, style }) => {
   return (
-    <TouchableOpacity style={styles.btn} onPress={onPress}>
+    <TouchableOpacity style={[styles.btn, style]} onPress={onPress}>
       <Text style={styles.btnText}>{title}</Text>
       {loading && <ActivityIndicator size="small" color="white" />}
     </TouchableOpacity>
