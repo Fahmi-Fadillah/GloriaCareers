@@ -12,7 +12,11 @@ import {
 } from "../../components";
 import { COLORS, icons, SIZES } from "../../constants";
 import { globalStyles } from "../../styles/styles";
-import { fetchJobDetails, handleLike } from "../../utils/firebaseAuth";
+import {
+  fetchJobDetails,
+  fetchUserType,
+  handleLike,
+} from "../../utils/firebaseAuth";
 
 const tabs = ["About", "Qualifications", "Responsibilities"];
 
@@ -26,11 +30,27 @@ function EmployerCreatedJobs({}) {
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [isLiked, setIsLiked] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
+  const [userType, setUserType] = useState(null);
+
+  useEffect(() => {
+    const fetchUserTypeAndDetails = async () => {
+      try {
+        const userType = await fetchUserType();
+        setUserType(userType);
+      } catch (error) {
+        console.log(error);
+        setError(error.message);
+      }
+    };
+
+    fetchUserTypeAndDetails();
+  }, []);
 
   useEffect(() => {
     const fetchDetails = async () => {
+      if (!userType) return;
       try {
-        const { job, isLiked, isApplied } = await fetchJobDetails(id);
+        const { job, isLiked, isApplied } = await fetchJobDetails(id, userType);
         setJob(job);
         setIsLiked(isLiked);
         setIsApplied(isApplied);
@@ -42,7 +62,7 @@ function EmployerCreatedJobs({}) {
     };
 
     fetchDetails();
-  }, [id]);
+  }, [id, userType]);
 
   const handleLikeJob = async () => {
     try {
@@ -161,14 +181,16 @@ function EmployerCreatedJobs({}) {
             </View>
           )}
         </ScrollView>
-        <JobFooter
-          url={"kapilbadokar.vercel.app"}
-          isEmployerPage={true}
-          onLike={handleLikeJob}
-          isLiked={isLiked}
-          jobId={id}
-          isApplied={isApplied}
-        />
+        {userType == "seeker" && (
+          <JobFooter
+            url={"kapilbadokar.vercel.app"}
+            isEmployerPage={true}
+            onLike={handleLikeJob}
+            isLiked={isLiked}
+            jobId={id}
+            isApplied={isApplied}
+          />
+        )}
       </SafeAreaView>
     </>
   );

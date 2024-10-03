@@ -148,7 +148,7 @@ export const fetchJobs = async () => {
   }
 };
 
-export const fetchJobDetails = async (jobId) => {
+export const fetchJobDetails = async (jobId, userType) => {
   try {
     const docRef = doc(db, "jobs", jobId);
     const docSnap = await getDoc(docRef);
@@ -156,17 +156,23 @@ export const fetchJobDetails = async (jobId) => {
     if (docSnap.exists()) {
       const job = docSnap.data();
       const userId = auth.currentUser.uid;
-      const userDocRef = doc(db, `seekers`, userId);
-      const userDocSnap = await getDoc(userDocRef);
+      if (userType === "seeker") {
+        const userDocRef = doc(db, "seekers", userId);
+        const userDocSnap = await getDoc(userDocRef);
 
-      if (userDocSnap.exists()) {
-        const savedJobs = userDocSnap.data().savedJobs || [];
-        const appliedJobs = userDocSnap.data().appliedJobs || [];
-        const isLiked = savedJobs.includes(jobId);
-        const isApplied = appliedJobs.includes(jobId);
-        return { job, isLiked, isApplied };
+        if (userDocSnap.exists()) {
+          const savedJobs = userDocSnap.data().savedJobs || [];
+          const appliedJobs = userDocSnap.data().appliedJobs || [];
+          const isLiked = savedJobs.includes(jobId);
+          const isApplied = appliedJobs.includes(jobId);
+          return { job, isLiked, isApplied };
+        } else {
+          throw new Error("User document does not exist");
+        }
+      } else if (userType === "employer") {
+        return { job, isLiked: false, isApplied: false };
       } else {
-        throw new Error("User document does not exist");
+        throw new Error("User type not specified");
       }
     } else {
       throw new Error("No such document!");
@@ -304,6 +310,29 @@ export const fetchApplicants = async () => {
     return jobsList;
   } catch (error) {
     console.error("Error fetching applicants: ", error);
+    throw error;
+  }
+};
+
+export const fetchUserType = async () => {
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const employerDocRef = doc(db, "employers", user.uid);
+    const jobSeekerDocRef = doc(db, "seekers", user.uid);
+
+    const employerDocSnapshot = await getDoc(employerDocRef);
+    const jobSeekerDocSnapshot = await getDoc(jobSeekerDocRef);
+
+    if (employerDocSnapshot.exists()) {
+      return "employer";
+    } else if (jobSeekerDocSnapshot.exists()) {
+      return "seeker";
+    } else {
+      throw new Error("No such user!");
+    }
+  } catch (error) {
+    console.log(error);
     throw error;
   }
 };
