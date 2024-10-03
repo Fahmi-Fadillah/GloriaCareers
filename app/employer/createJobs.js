@@ -1,12 +1,13 @@
 import { useNavigation } from "@react-navigation/native";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenHeaderBtn } from "../../components";
 import AppButton from "../../components/AppButton";
 import AppTextInput from "../../components/AppTextInput";
 import BottomBar from "../../components/BottomBar";
-import { COLORS } from "../../constants";
+import { COLORS, icons } from "../../constants";
 import { globalStyles } from "../../styles/styles";
 import { saveJob } from "../../utils/firebaseAuth";
 import { showToast } from "../../utils/index";
@@ -39,14 +40,25 @@ function createJobs() {
 
   return (
     <SafeAreaView style={globalStyles.container}>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: COLORS.lightWhite },
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <ScreenHeaderBtn
+              iconUrl={icons.left}
+              dimension="60%"
+              handlePress={() => router.back()}
+            />
+          ),
+          headerTitle: "Create Job",
+          headerTitleAlign: "center",
+          headerTitleStyle: { fontSize: 22, fontWeight: "bold" },
+        }}
+      />
       <ScrollView
         style={{ padding: 16 }}
-        contentContainerStyle={[
-          globalStyles.scrollViewContent,
-          {
-            justifyContent: "center",
-          },
-        ]}
+        contentContainerStyle={[globalStyles.scrollViewContent, {}]}
       >
         <Text style={{ fontSize: 24, marginBottom: 20, alignSelf: "center" }}>
           Create a Job Posting

@@ -247,9 +247,9 @@ export const fetchLikedJobs = async () => {
   if (userDocSnap.exists()) {
     const likedJobsIds = userDocSnap.data().savedJobs || [];
     const likedJobsList = [];
-
+    const userType = await fetchUserType();
     for (const jobId of likedJobsIds) {
-      const jobDetails = await fetchJobDetails(jobId);
+      const jobDetails = await fetchJobDetails(jobId, userType);
       likedJobsList.push({
         id: jobId,
         ...jobDetails.job,

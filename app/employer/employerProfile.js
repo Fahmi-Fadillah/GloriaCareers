@@ -1,10 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
+import { router, Stack } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../../app/firebase";
+import { ScreenHeaderBtn } from "../../components";
 import BottomBar from "../../components/BottomBar";
-import { COLORS } from "../../constants";
+import { COLORS, icons } from "../../constants";
+import { globalStyles } from "../../styles/styles";
 
 function employerProfile(props) {
   const navigation = useNavigation();
@@ -26,22 +30,40 @@ function employerProfile(props) {
   }, []);
 
   return (
-    <>
-      <View style={styles.container}>
-        {employerData && (
-          <View style={styles.infoContainer}>
-            <Text style={styles.text}>Email: {employerData.email}</Text>
-            <Text style={styles.text}>
-              Company Name: {employerData.companyName}
-            </Text>
-            <Text style={styles.text}>
-              Location: {employerData.companyLocation}
-            </Text>
-          </View>
-        )}
-      </View>
+    <SafeAreaView style={globalStyles.container}>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: COLORS.lightWhite },
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <ScreenHeaderBtn
+              iconUrl={icons.left}
+              dimension="60%"
+              handlePress={() => router.back()}
+            />
+          ),
+          headerTitle: "Profile",
+          headerTitleAlign: "center",
+          headerTitleStyle: { fontSize: 22, fontWeight: "bold" },
+        }}
+      />
+      <ScrollView contentContainerStyle={globalStyles.scrollViewContent}>
+        <View style={styles.container}>
+          {employerData && (
+            <View style={styles.infoContainer}>
+              <Text style={styles.text}>Email: {employerData.email}</Text>
+              <Text style={styles.text}>
+                Company Name: {employerData.companyName}
+              </Text>
+              <Text style={styles.text}>
+                Location: {employerData.companyLocation}
+              </Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
       <BottomBar navigation={navigation} />
-    </>
+    </SafeAreaView>
   );
 }
 

@@ -1,4 +1,5 @@
 import { EvilIcons, Ionicons } from "@expo/vector-icons";
+import { router, Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,7 +11,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS } from "../../constants";
+import { ScreenHeaderBtn } from "../../components";
+import { COLORS, icons } from "../../constants";
 import { globalStyles } from "../../styles/styles";
 import { fetchApplicants } from "../../utils/firebaseAuth";
 
@@ -51,6 +53,22 @@ const JobApplicants = () => {
 
   return (
     <SafeAreaView style={globalStyles.container}>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: COLORS.lightWhite },
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <ScreenHeaderBtn
+              iconUrl={icons.left}
+              dimension="60%"
+              handlePress={() => router.back()}
+            />
+          ),
+          headerTitle: "Posted Jobs",
+          headerTitleAlign: "center",
+          headerTitleStyle: { fontSize: 22, fontWeight: "bold" },
+        }}
+      />
       <ScrollView
         contentContainerStyle={[
           globalStyles.scrollViewContent,

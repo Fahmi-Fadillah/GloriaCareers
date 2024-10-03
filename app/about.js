@@ -47,14 +47,7 @@ function About(props) {
   ];
 
   return (
-    <SafeAreaView
-      style={[
-        globalStyles.container,
-        {
-          marginTop: 0,
-        },
-      ]}
-    >
+    <SafeAreaView style={globalStyles.container}>
       <Stack.Screen
         options={{
           headerStyle: { backgroundColor: COLORS.lightWhite },

@@ -70,12 +70,12 @@ const Layout = () => {
         <Stack.Screen name="about" options={{ headerShown: true }} />
         <Stack.Screen
           name="employer/createJobs"
-          options={{ headerShown: false }}
+          options={{ headerShown: true }}
         />
         <Stack.Screen name="employer/[id]" options={{ headerShown: true }} />
         <Stack.Screen
           name="employer/employerProfile"
-          options={{ headerShown: false }}
+          options={{ headerShown: true }}
         />
         <Stack.Screen
           name="employer/employerHome"
@@ -84,9 +84,10 @@ const Layout = () => {
         <Stack.Screen
           name="employer/jobApplicants"
           options={{
-            headerShown: false,
+            headerShown: true,
           }}
         />
+        <Stack.Screen name="likedJobs" options={{ headerShown: true }} />
       </Stack>
     </RootSiblingParent>
   );

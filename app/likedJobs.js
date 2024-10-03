@@ -58,7 +58,9 @@ const LikedJobsScreen = () => {
               handlePress={() => router.back()}
             />
           ),
-          headerTitle: "",
+          headerTitle: "Saved Jobs",
+          headerTitleAlign: "center",
+          headerTitleStyle: { fontSize: 22, fontWeight: "bold" },
         }}
       />
       <View style={styles.container}>
