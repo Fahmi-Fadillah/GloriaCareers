@@ -29,29 +29,44 @@ const JobSearch = () => {
     setSearchResult([]);
     const remoteJobsOnly = params.remote_jobs_only || "false";
 
-    try {
+    const apiKeys = [
+      process.env.REACT_APP_API_KEY_2,
+      process.env.REACT_APP_API_KEY_3,
+      process.env.REACT_APP_API_KEY_4,
+      process.env.REACT_APP_API_KEY_1,
+      process.env.REACT_APP_API_KEY_5,
+    ];
+
+    for (let key of apiKeys) {
       const options = {
         method: "GET",
         url: `https://jsearch.p.rapidapi.com/search`,
         headers: {
-          "X-RapidAPI-Key": process.env.REACT_APP_API_KEY_4,
+          "X-RapidAPI-Key": key,
           "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
         },
         params: {
           query: params.id + "India",
           page: page.toString(),
-          remote_jobs_only: remoteJobsOnly, //added for remote jobs
+          remote_jobs_only: remoteJobsOnly,
         },
       };
 
-      const response = await axios.request(options);
-      setSearchResult(response.data.data);
-    } catch (error) {
-      setSearchError(error);
-      console.log(error);
-    } finally {
-      setSearchLoader(false);
+      try {
+        const response = await axios.request(options);
+        if (response.status === 200) {
+          setSearchResult(response.data.data);
+          setSearchLoader(false);
+          setSearchError(null);
+          return;
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
+
+    setSearchError("All API keys are expired or invalid");
+    setSearchLoader(false);
   };
 
   const handlePagination = (direction) => {
