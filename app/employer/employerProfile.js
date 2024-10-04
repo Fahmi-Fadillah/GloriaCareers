@@ -109,7 +109,10 @@ function EmployerProfile(props) {
           ),
           headerRight: () => (
             <TouchableOpacity
-              onPress={handlelogOut}
+              onPress={() => {
+                handlelogOut();
+                router.replace("auth");
+              }}
               style={{ marginRight: 10 }}
             >
               <Ionicons

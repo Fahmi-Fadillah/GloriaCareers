@@ -1,4 +1,3 @@
-import { router } from "expo-router";
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -99,7 +98,6 @@ export const handlelogOut = async () => {
     await signOut(auth);
     console.log("User signed out");
     showToast("User signed out");
-    router.replace("auth");
   } catch (error) {
     console.log("Error signing out: ", error);
     showToast("Error signing out");

@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { BackHandler, ScrollView, View } from "react-native";
 import { Nearbyjobs, Popularjobs, Welcome } from "../components";
 import { SIZES } from "../constants";
 // import EmployerCard from "../components/common/EmployerCard";
@@ -28,7 +28,20 @@ const Home = () => {
         router.replace("auth");
       }
     });
-    return () => unsubscribe();
+
+    const backAction = () => {
+      BackHandler.exitApp();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => {
+      unsubscribe();
+      backHandler.remove();
+    };
   }, []);
 
   if (!isSignedIn) {
@@ -59,7 +72,10 @@ const Home = () => {
     {
       label: "Logout",
       icon: "log-out-outline",
-      action: handlelogOut,
+      action: () => {
+        handlelogOut();
+        router.replace("auth");
+      },
     },
   ];
 

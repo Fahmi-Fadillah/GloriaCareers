@@ -1,6 +1,7 @@
 import { Formik } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  BackHandler,
   Image,
   ScrollView,
   StyleSheet,
@@ -91,6 +92,21 @@ export default function SignInScreen() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    const backAction = () => {
+      BackHandler.exitApp();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => {
+      unsubscribe();
+      backHandler.remove();
+    };
+  }, []);
 
   return (
     <SafeAreaView style={globalStyles.containerStyle}>
