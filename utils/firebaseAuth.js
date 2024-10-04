@@ -412,3 +412,15 @@ export const fetchUserName = async () => {
     throw error;
   }
 };
+
+export const savePushToken = async (userId, token) => {
+  try {
+    const userDocRef = doc(db, "seekers", userId);
+    await updateDoc(userDocRef, {
+      pushToken: token,
+    });
+  } catch (error) {
+    console.error("Error saving push token: ", error);
+    throw error;
+  }
+};

@@ -12,17 +12,20 @@ import * as Yup from "yup";
 import AppTextInput from "../components/AppTextInput";
 import ErrorMessage from "../components/ErrorMessage";
 
+import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Logo from "../assets/logo.png";
 import AppButton from "../components/AppButton";
 import { COLORS } from "../constants";
+import { usePushNotifications } from "../hook/usePushNotification";
 import { globalStyles } from "../styles/styles";
 import {
   handleEmployerSignUp,
   handleSignIn,
   handleUserSignUp,
+  savePushToken,
 } from "../utils/firebaseAuth";
-import { useRouter } from "expo-router";
+import { auth } from "./firebase";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email().required().label("Email"),
@@ -46,6 +49,7 @@ export default function SignInScreen() {
   const [isEmployer, setIsEmployer] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { expoPushToken } = usePushNotifications();
   const onSignIn = async (email, password) => {
     setLoading(true);
     try {
@@ -53,6 +57,9 @@ export default function SignInScreen() {
       if (userType === "employer") {
         router.replace("employer/employerHome");
       } else {
+        if (expoPushToken) {
+          await savePushToken(auth.currentUser.uid, expoPushToken.data);
+        }
         router.replace("home");
       }
     } catch (error) {
@@ -75,6 +82,7 @@ export default function SignInScreen() {
         router.replace("employer/employerHome");
       } else {
         await handleUserSignUp(values.email, values.password, values.name);
+        await savePushToken(auth.currentUser.uid, expoPushToken.data);
       }
       router.replace("home");
     } catch (error) {
