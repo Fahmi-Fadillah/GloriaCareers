@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SIZES } from '../../../constants';
+import { showToast } from '../../../utils';
 import { applyForJob } from '../../../utils/firebaseAuth';
 import styles from "./footer.style";
 const Footer = ({ url, onLike, isLiked, isApplied, jobId, isEmployerPage, hideBookmark }) => {
@@ -13,8 +14,12 @@ const Footer = ({ url, onLike, isLiked, isApplied, jobId, isEmployerPage, hideBo
   const handleApply = async () => {
     if (isEmployerPage) {
       await applyForJob(jobId);
-    } else {
-      await Linking.openURL(url);
+    } {
+      if (url) {
+        await Linking.openURL(url);
+      } else {
+        showToast("No link provided or the link has expired");
+      }
     }
   };
   return (

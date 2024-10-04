@@ -1,16 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-
-import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
-
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { Share } from "react-native";
+import { useMemo, useState } from "react";
+import { ActivityIndicator, ScrollView, Share, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Company,
   JobAbout,
@@ -21,104 +12,57 @@ import {
 } from "../../components";
 import { COLORS, icons, SIZES } from "../../constants";
 import useFetch from "../../hook/useFetch";
-import { showToast } from "../../utils";
-import { auth, db } from "../firebase"; // assuming you have a firebase config file
+import { globalStyles } from "../../styles/styles";
+
 const tabs = ["About", "Qualifications", "Responsibilities"];
 
 const JobDetails = () => {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const userId = auth.currentUser.uid;
-
-  const { data, isLoading, error, refetch } = useFetch("job-details", {
+  const { data, isLoading, error } = useFetch("job-details", {
     job_id: params.id,
   });
-  const [err, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(tabs[0]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
 
-  useEffect(() => {
-    const fetchJobDetails = async () => {
-      const docRef = doc(db, "likedJobs", userId, "jobs", params.id);
-      const docSnap = await getDoc(docRef);
-      try {
-        if (docSnap.exists()) {
-          const userId = auth.currentUser.uid;
-          const jobDocRef = doc(db, "likedJobs", userId, "jobs", params.id);
-          const jobDocSnap = await getDoc(jobDocRef);
-          if (jobDocSnap.exists()) {
-            setIsLiked(true);
-          } else {
-            setIsLiked(false);
-          }
-        } else {
-          setError("No such document!", err.message);
-        }
-      } catch (err) {
-        setError(err.message);
-      }
-    };
+  const displayTabContent = useMemo(() => {
+    if (!data || data.length === 0) return null;
 
-    fetchJobDetails();
-  }, [userId]);
+    const {
+      job_description = "No data provided",
+      job_highlights: { Qualifications = [], Responsibilities = [] } = {},
+    } = data[0];
 
-  // const onRefresh = useCallback(() => {
-  //   setRefreshing(true);
-  //   refetch();
-  //   setRefreshing(false);
-  // }, [userId, params.id]);
+    const aboutContent = job_description;
 
-  const displayTabContent = () => {
     switch (activeTab) {
+      case "About":
+        return <JobAbout info={aboutContent} />;
       case "Qualifications":
         return (
           <Specifics
             title="Qualifications"
-            points={data[0].job_highlights?.Qualifications ?? ["N/A"]}
+            points={
+              data[0].job_highlights?.Qualifications ?? [
+                "No Qualifications were found for this job.",
+              ]
+            }
           />
         );
-
-      case "About":
-        return (
-          <JobAbout info={data[0].job_description ?? "No data provided"} />
-        );
-
       case "Responsibilities":
         return (
           <Specifics
             title="Responsibilities"
-            points={data[0].job_highlights?.Responsibilities ?? ["N/A"]}
+            points={
+              data[0].job_highlights?.Responsibilities ?? [
+                "No Responsibilities were found for this job.",
+              ]
+            }
           />
         );
-
       default:
         return null;
     }
-  };
-
-  const handleLike = async () => {
-    const userId = auth.currentUser.uid;
-    const jobDocRef = doc(db, `likedJobs/${userId}/jobs`, data[0].job_id);
-    const jobDocSnap = await getDoc(jobDocRef);
-
-    if (jobDocSnap.exists()) {
-      // The job is already liked, so we don't do anything
-      setIsLiked(true);
-      showToast("Job is already liked");
-    } else {
-      const jobDetailsObject = {
-        jobTitle: data[0].job_title,
-        employerName: data[0].employer_name,
-        jobCountry: data[0].job_country,
-        jobLogo: data[0].employer_logo,
-        jobId: data[0].job_id,
-        type: "api",
-      };
-      await setDoc(jobDocRef, jobDetailsObject);
-      setIsLiked(true);
-    }
-  };
+  }, [data, activeTab]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.lightWhite }}>
@@ -140,12 +84,10 @@ const JobDetails = () => {
               iconUrl={icons.share}
               dimension="60%"
               handlePress={() => {
-                const jobLink = data[0]?.job_google_link;
+                const jobLink = data?.[0]?.job_apply_link;
                 Share.share({
                   message: `Check out this job:\n ${jobLink}`,
                   url: jobLink,
-                  // You can also add a URL to share
-                  // url: '<job link here>'
                 });
               }}
               showModal={false}
@@ -155,49 +97,37 @@ const JobDetails = () => {
         }}
       />
 
-      <>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          // refreshControl={
-          //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          // }
-        >
-          {isLoading ? (
-            <ActivityIndicator size="large" color={COLORS.primary} />
-          ) : error ? (
-            <Text> {error.message}Something went wrong</Text>
-          ) : data.length === 0 ? (
-            <Text>No data available</Text>
-          ) : (
-            <View style={{ padding: SIZES.medium, paddingBottom: 100 }}>
-              <Company
-                companyLogo={data[0].employer_logo}
-                jobTitle={data[0].job_title}
-                companyName={data[0].employer_name}
-                location={data[0].job_country}
-              />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={globalStyles.scrollViewContent}
+      >
+        {isLoading ? (
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        ) : error ? (
+          <Text>Something went wrong: {error.message}</Text>
+        ) : data.length === 0 ? (
+          <Text>No data available</Text>
+        ) : (
+          <View style={{ padding: SIZES.medium, paddingBottom: 100 }}>
+            <Company
+              companyLogo={data[0]?.employer_logo}
+              jobTitle={data[0]?.job_title}
+              companyName={data[0]?.employer_name}
+              location={data[0]?.job_country}
+            />
 
-              <JobTabs
-                tabs={tabs}
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-              />
+            <JobTabs
+              tabs={tabs}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
 
-              {displayTabContent()}
-            </View>
-          )}
-        </ScrollView>
+            {displayTabContent}
+          </View>
+        )}
+      </ScrollView>
 
-        <JobFooter
-          url={
-            data[0]?.job_google_link ??
-            "https://careers.google.com/jobs/results/"
-          }
-          onLike={handleLike}
-          hideBookmark={true}
-          isLiked={isLiked}
-        />
-      </>
+      <JobFooter url={data?.[0]?.job_apply_link} hideBookmark={true} />
     </SafeAreaView>
   );
 };
