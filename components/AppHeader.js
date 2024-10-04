@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { getAuth, signOut } from "firebase/auth";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import profileIcon from "../assets/logo.png";
+import profileIcon from "../assets/icon.png";
 import icons from "../constants/icons";
 import { showToast } from "../utils/index";
 import ScreenHeaderBtn from "./common/header/ScreenHeaderBtn";
@@ -33,7 +33,7 @@ const AppHeader = ({ title, onBackPress, routingOptions }) => {
         dimension="100%"
         options={[]}
         showModal={false}
-        handlePress={() => showToast("Profile Coming Soon")}
+        handlePress={() => router.push("about")}
       />
     </View>
   );

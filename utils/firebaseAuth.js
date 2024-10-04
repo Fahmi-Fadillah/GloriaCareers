@@ -392,3 +392,23 @@ export const updateSeekerData = async (userId, formData) => {
   const docRef = doc(db, "seekers", userId);
   await updateDoc(docRef, formData);
 };
+
+export const fetchUserName = async () => {
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const userType = await fetchUserType();
+      let userData;
+      if (userType === "seeker") {
+        userData = await fetchSeekerData(user.uid);
+      } else if (userType === "employer") {
+        userData = await fetchEmployerData(user.uid);
+      }
+      return { userName: userData?.name || userData?.companyName, userType };
+    }
+  } catch (error) {
+    console.error("Error fetching user data: ", error);
+    throw error;
+  }
+};

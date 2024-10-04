@@ -21,7 +21,7 @@ function About(props) {
     {
       name: "Kapil Badokar",
       social: "https://www.linkedin.com/in/kapil-badokar/",
-      role: "Lead Developer",
+      role: "Application Developer",
       bio: "Kapil is a seasoned developer with a passion for building scalable applications.",
     },
     {

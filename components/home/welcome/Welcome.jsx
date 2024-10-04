@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FlatList,
   Image,
@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import { icons, SIZES } from "../../../constants";
+import { fetchUserName } from "../../../utils/firebaseAuth";
 import styles from "./welcome.style";
 
 const jobTypes = ["Full-time", "Part-time", "Remote"];
@@ -17,12 +18,26 @@ const jobTypes = ["Full-time", "Part-time", "Remote"];
 const Welcome = ({ searchTerm, setSearchTerm, handleClick }) => {
   const router = useRouter();
   const [activeJobType, setActiveJobType] = useState("Full-time");
+  const [userName, setUserName] = useState("User");
+  const [userType, setUserType] = useState("");
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const { userName, userType } = await fetchUserName();
+        setUserName(userName);
+        setUserType(userType);
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    };
+    getUserData();
+  }, []);
 
   return (
     <View>
       <View style={styles.container}>
-        <Text style={styles.userName}>Hello User,</Text>
-        <Text style={styles.welcomeMessage}>Find your perfect job</Text>
+        <Text style={styles.userName}>Hello {userName}</Text>
+        <Text style={styles.welcomeMessage}>{userType === "employer" ? "Post a Job Opportunity" : "Find your perfect job"}</Text>
       </View>
 
       <View style={styles.searchContainer}>
