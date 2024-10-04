@@ -19,7 +19,16 @@
         "backgroundColor": "#FFFFFF"
       }
     },
-    "plugins": ["expo-router", "expo-font"],
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-updates",
+        {
+          "username": "kapil619"
+        }
+      ]
+    ],
     "extra": {
       "router": {
         "origin": false
@@ -27,6 +36,13 @@
       "eas": {
         "projectId": "48f1f908-7670-487a-9c81-9e913de07961"
       }
-    }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/48f1f908-7670-487a-9c81-9e913de07961"
+    },
+    "ios": {}
   }
 }
