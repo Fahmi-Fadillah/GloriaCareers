@@ -17,6 +17,7 @@ const Layout = () => {
       if (update.isAvailable) {
         await Updates.fetchUpdateAsync();
         await Updates.reloadAsync();
+        console.log("Update fetched and reloaded");
       }
     } catch (error) {
       // You can also add an alert() to see the error message in case of an error when fetching updates.

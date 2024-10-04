@@ -42,12 +42,15 @@ export const handleSignIn = async (email, password) => {
       throw new Error("No such user!");
     }
   } catch (error) {
-    if (error.code === "auth/wrong-password") {
-      showToast("Incorrect password. Please try again.");
-      throw new Error("Incorrect password. Please try again.");
+    if (error.code === "auth/email-already-exists") {
+      showToast("Email already exists. Please use a different email.");
+      throw new Error("Email already in use. Please try again.");
     } else if (error.code === "auth/user-not-found") {
       showToast("No user found with this email.");
       throw new Error("No user found with this email.");
+    } else if (error.code === "auth/invalid-credential") {
+      showToast("Invalid credentials. Please try again.");
+      throw new Error("Invalid credentials. Please try again.");
     } else {
       showToast(error.message);
       throw new Error(error.message);
@@ -75,8 +78,20 @@ export const handleEmployerSignUp = async (
       createdJobs: [],
     });
   } catch (error) {
-    console.log(error);
-    throw error;
+    if (error.code === "auth/email-already-exists") {
+      showToast("Email already in use. Please use a different email.");
+      throw new Error(
+        "This email is already in use. Please use a different email."
+      );
+    } else if (error.code === "auth/invalid-password") {
+      showToast("The password is too weak. Please use a stronger password.");
+      throw new Error(
+        "The password is too weak. Please use a stronger password."
+      );
+    } else {
+      showToast(error.message);
+      throw new Error(error.message);
+    }
   }
 };
 
@@ -95,12 +110,12 @@ export const handleUserSignUp = async (email, password, name) => {
       appliedJobs: [],
     });
   } catch (error) {
-    if (error.code === "auth/email-already-in-use") {
+    if (error.code === "auth/email-already-exists") {
       showToast("Email already in use. Please use a different email.");
       throw new Error(
         "This email is already in use. Please use a different email."
       );
-    } else if (error.code === "auth/weak-password") {
+    } else if (error.code === "auth/invalid-password") {
       showToast("The password is too weak. Please use a stronger password.");
       throw new Error(
         "The password is too weak. Please use a stronger password."
