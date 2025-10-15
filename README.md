@@ -1,6 +1,6 @@
-# JobCentral 🏢
+# GloriaCareers 🏢
 
-JobCentral is Mobile Application created with React-Native + Expo.
+GloriaCareers is Mobile Application created with React-Native + Expo.
 ## Tech Stack🛠️
 
 - React-Native
