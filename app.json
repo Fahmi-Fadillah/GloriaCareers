@@ -1,11 +1,11 @@
 {
   "expo": {
-    "scheme": "jobcentral",
+    "scheme": "GloriaCareers",
     "web": {
       "bundler": "metro"
     },
-    "name": "JobCentral",
-    "slug": "jobcentral",
+    "name": "GloriaCareers",
+    "slug": "GloriaCareers",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",

@@ -67,14 +67,14 @@ function About(props) {
 
       <ScrollView contentContainerStyle={[styles.scrollViewContent]}>
         <Image source={Logo} resizeMode="contain" style={styles.headerImage} />
-        <Text style={styles.title}>Welcome to JobCentral</Text>
+        <Text style={styles.title}>Welcome to GloriaCareers</Text>
         <Text style={styles.paragraph}>
-          Your ultimate destination for simplified job searching! At JobCentral,
+          Your ultimate destination for simplified job searching! At GloriaCareers,
           we believe in making the job search process effortless for users
           worldwide. Our centralized platform aggregates job listings from
           various sources, providing you with a comprehensive database of
           opportunities. Whether you're a seasoned professional or a fresh
-          graduate, JobCentral offers intuitive features, personalized
+          graduate, GloriaCareers offers intuitive features, personalized
           recommendations, and seamless navigation to help you find your dream
           job.
         </Text>
@@ -120,7 +120,7 @@ function About(props) {
             },
           ]}
         >
-          Copyright © JobCentral{" "}
+          Copyright © GloriaCareers{" "}
         </Text>
       </ScrollView>
     </SafeAreaView>
