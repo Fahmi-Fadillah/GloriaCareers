@@ -1,31 +1,18 @@
 import { Formik } from "formik";
-import React, { useEffect, useState } from "react";
-import {
-  BackHandler,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useEffect, useState } from "react";
+import { BackHandler, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Yup from "yup";
 import AppTextInput from "../components/AppTextInput";
 import ErrorMessage from "../components/ErrorMessage";
 
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Logo from "../assets/logo.png";
+import Logo from "../assets/background.png";
 import AppButton from "../components/AppButton";
 import { COLORS } from "../constants";
 import { usePushNotifications } from "../hook/usePushNotification";
 import { globalStyles } from "../styles/styles";
-import {
-  handleEmployerSignUp,
-  handleSignIn,
-  handleUserSignUp,
-  savePushToken,
-} from "../utils/firebaseAuth";
+import { handleEmployerSignUp, handleSignIn, handleUserSignUp, savePushToken } from "../utils/firebaseAuth";
 import { auth } from "./firebase";
 
 const validationSchema = Yup.object().shape({
@@ -74,12 +61,7 @@ export default function SignInScreen() {
     setLoading(true);
     try {
       if (isEmployer) {
-        await handleEmployerSignUp(
-          values.email,
-          values.password,
-          values.companyName,
-          values.companyLocation
-        );
+        await handleEmployerSignUp(values.email, values.password, values.companyName, values.companyLocation);
         router.replace("employer/employerHome");
       } else {
         await handleUserSignUp(values.email, values.password, values.name);
@@ -98,10 +80,7 @@ export default function SignInScreen() {
       return true;
     };
 
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
     return () => {
       unsubscribe();
       backHandler.remove();
@@ -113,37 +92,11 @@ export default function SignInScreen() {
       <ScrollView contentContainerStyle={globalStyles.scrollViewContent}>
         <Image style={styles.logoImg} resizeMode="contain" source={Logo} />
         <View style={styles.userTypeContainer}>
-          <TouchableOpacity
-            style={[
-              styles.userTypeButton,
-              isEmployer && styles.activeUserTypeButton,
-            ]}
-            onPress={() => setIsEmployer(true)}
-          >
-            <Text
-              style={[
-                styles.userTypeText,
-                isEmployer && styles.activeUserTypeText,
-              ]}
-            >
-              Employer
-            </Text>
+          <TouchableOpacity style={[styles.userTypeButton, isEmployer && styles.activeUserTypeButton]} onPress={() => setIsEmployer(true)}>
+            <Text style={[styles.userTypeText, isEmployer && styles.activeUserTypeText]}>Employer</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.userTypeButton,
-              !isEmployer && styles.activeUserTypeButton,
-            ]}
-            onPress={() => setIsEmployer(false)}
-          >
-            <Text
-              style={[
-                styles.userTypeText,
-                !isEmployer && styles.activeUserTypeText,
-              ]}
-            >
-              Job Seeker
-            </Text>
+          <TouchableOpacity style={[styles.userTypeButton, !isEmployer && styles.activeUserTypeButton]} onPress={() => setIsEmployer(false)}>
+            <Text style={[styles.userTypeText, !isEmployer && styles.activeUserTypeText]}>Job Seeker</Text>
           </TouchableOpacity>
         </View>
 
@@ -157,9 +110,7 @@ export default function SignInScreen() {
           }}
           onSubmit={(values, actions) => {
             try {
-              isSignUpMode
-                ? onSignUp(values)
-                : onSignIn(values.email, values.password);
+              isSignUpMode ? onSignUp(values) : onSignIn(values.email, values.password);
               actions.resetForm();
             } catch (e) {
               console.log(e);
@@ -167,14 +118,7 @@ export default function SignInScreen() {
           }}
           validationSchema={validationSchema}
         >
-          {({
-            handleChange,
-            handleSubmit,
-            errors,
-            values,
-            setFieldTouched,
-            touched,
-          }) => (
+          {({ handleChange, handleSubmit, errors, values, setFieldTouched, touched }) => (
             <>
               <AppTextInput
                 iconName={"mail-outline"}
@@ -199,10 +143,7 @@ export default function SignInScreen() {
                 autoCapitalize={"none"}
                 accessibilityLabel="password"
               />
-              <ErrorMessage
-                error={errors.password}
-                visible={touched.password}
-              />
+              <ErrorMessage error={errors.password} visible={touched.password} />
               {isEmployer && isSignUpMode && (
                 <>
                   <AppTextInput
@@ -213,10 +154,7 @@ export default function SignInScreen() {
                     value={values.companyName}
                     autoCapitalize={"none"}
                   />
-                  <ErrorMessage
-                    error={errors.companyName}
-                    visible={touched.companyName}
-                  />
+                  <ErrorMessage error={errors.companyName} visible={touched.companyName} />
                   <AppTextInput
                     iconName={"location-outline"}
                     placeholder={"Enter your Company Location"}
@@ -226,41 +164,19 @@ export default function SignInScreen() {
                     autoCapitalize={"none"}
                     accessibilityLabel="Location"
                   />
-                  <ErrorMessage
-                    error={errors.companyLocation}
-                    visible={touched.companyLocation}
-                  />
+                  <ErrorMessage error={errors.companyLocation} visible={touched.companyLocation} />
                 </>
               )}
               {!isEmployer && isSignUpMode && (
                 <>
-                  <AppTextInput
-                    iconName={"person-outline"}
-                    placeholder={"Enter your Name"}
-                    onChangeText={handleChange("name")}
-                    onBlur={() => setFieldTouched("name")}
-                    value={values.name}
-                    autoCapitalize={"true"}
-                    accessibilityLabel="name"
-                  />
+                  <AppTextInput iconName={"person-outline"} placeholder={"Enter your Name"} onChangeText={handleChange("name")} onBlur={() => setFieldTouched("name")} value={values.name} autoCapitalize={"true"} accessibilityLabel="name" />
                   <ErrorMessage error={errors.name} visible={touched.name} />
                 </>
               )}
-              <AppButton
-                title={isSignUpMode ? "Sign Up" : "Sign in"}
-                onPress={handleSubmit}
-                loading={loading}
-              />
-              <TouchableOpacity
-                style={styles.inlineText}
-                onPress={() => setIsSignUpMode(!isSignUpMode)}
-              >
-                <Text style={styles.switchText2}>
-                  {isSignUpMode ? "Already registered? " : "Not registered? "}
-                </Text>
-                <Text style={styles.switchText}>
-                  {isSignUpMode ? " Sign in instead" : " Sign up instead"}
-                </Text>
+              <AppButton title={isSignUpMode ? "Sign Up" : "Sign in"} onPress={handleSubmit} loading={loading} />
+              <TouchableOpacity style={styles.inlineText} onPress={() => setIsSignUpMode(!isSignUpMode)}>
+                <Text style={styles.switchText2}>{isSignUpMode ? "Already registered? " : "Not registered? "}</Text>
+                <Text style={styles.switchText}>{isSignUpMode ? " Sign in instead" : " Sign up instead"}</Text>
               </TouchableOpacity>
             </>
           )}

@@ -1,6 +1,6 @@
-import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+// firebase.js
 import { initializeApp } from "firebase/app";
-import { getReactNativePersistence, initializeAuth } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -13,11 +13,11 @@ const firebaseConfig = {
   measurementId: process.env.FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
+// ✅ Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
-});
-const db = getFirestore();
+const auth = getAuth(app);
+const db = getFirestore(app);
 
+// ✅ Export semuanya supaya bisa dipakai di file lain
 export { app, auth, db };
+export default app;

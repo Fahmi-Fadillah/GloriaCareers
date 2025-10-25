@@ -1,8 +1,7 @@
 {
   "scripts": {
-    "start": "expo start",
+    "start": "expo",
     "android": "expo start --android",
-    "ios": "expo start --ios",
     "web": "expo start --web"
   },
   "dependencies": {
@@ -43,7 +42,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
-    "react-native-dotenv": "^3.4.8"
+    "react-native-dotenv": "^3.4.11"
   },
   "overrides": {
     "metro": "~0.80.8",
