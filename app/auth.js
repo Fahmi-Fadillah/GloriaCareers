@@ -131,7 +131,6 @@ export default function SignInScreen() {
       } else {
 
         await handleUserSignUp(values.email, values.password, values.name);
-
         await savePushToken(auth.currentUser.uid, expoPushToken.data);
 
       }

@@ -34,7 +34,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "48f1f908-7670-487a-9c81-9e913de07961"
+        "projectId": "5ae6597b-452a-424e-a97b-88b233f5bb8a1"
       }
     },
     "runtimeVersion": {
@@ -43,7 +43,7 @@
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
-      "url": "https://u.expo.dev/48f1f908-7670-487a-9c81-9e913de07961"
+      "url": "https://u.expo.dev/5ae6597b-452a-424e-a97b-88b233f5bb8a"
     },
     "ios": {}
   }
