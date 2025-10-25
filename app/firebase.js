@@ -1,23 +1,27 @@
-// firebase.js
+// app/firebase.js
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID,
-  measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+    // Pastikan nilai-nilai ini diapit tanda kutip
+    apiKey: "AIzaSyCQDsDgY89zq7KZdY-AzoOh9r9EDI5e0xY", 
+    
+    // 💡 INI SANGAT KRUSIAL untuk Autentikasi
+    authDomain: "gloria-carrer.firebaseapp.com",
+    
+    projectId: "gloria-carrer",
+    storageBucket: "gloria-carrer.firebasestorage.app",
+    messagingSenderId: 60728723029, 
+    appId: "1:60728723029:android:2915f76980e8ad6a57b6dc", 
 };
 
-// ✅ Initialize Firebase
+// Inisialisasi Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+// 💡 Pastikan getAuth(app) dipanggil dengan benar
+const auth = getAuth(app); 
 const db = getFirestore(app);
 
-// ✅ Export semuanya supaya bisa dipakai di file lain
+// Export modul
 export { app, auth, db };
 export default app;
